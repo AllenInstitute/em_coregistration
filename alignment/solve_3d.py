@@ -5,22 +5,32 @@ from .transform import Transform
 import numpy as np
 import scipy
 
-example = {
+example1 = {
         'data': {
             'landmark_file': './data/17797_2Pfix_EMmoving_20190405_PA_1724_merged.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
             'actions': ['invert_opty'],
-            #'sd_set': {'src': 'em', 'dst': 'opt'}
+            'sd_set': {'src': 'em', 'dst': 'opt'}
+        },
+        'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/3D_alignment/tmp_out/transform.json',
+        'model': 'TPS',
+        'npts': 10,
+        'regularization': {
+            'translation': 1e0,
+            'linear': 1e0,
+            'other': 1e20
+            }
+}
+example2 = {
+        'data': {
+            'landmark_file': './data/17797_2Pfix_EMmoving_20190405_PA_1724_merged.csv',
+            'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
+            'actions': ['invert_opty'],
             'sd_set': {'src': 'opt', 'dst': 'em'}
         },
         'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/3D_alignment/tmp_out/transform.json',
         'model': 'TPS',
         'npts': 10,
-        #'regularization': {
-        #    'translation': 1e-10,
-        #    'linear': 1e-10,
-        #    'other': 1e4
-        #    }
         'regularization': {
             'translation': 1e-10,
             'linear': 1e-3,
@@ -65,20 +75,26 @@ def create_regularization(n, d):
     return R
 
 
+def write_control_to_file(fpath, src, dst):
+    out = np.hstack((src, dst))
+    np.savetxt(fpath, out, fmt='%0.8e', delimiter=',')
+    print('wrote %s' % fpath)
+
+
 class Solve3D(argschema.ArgSchemaParser):
     default_schema = SolverSchema
 
-    def run(self):
+    def run(self, control_pts=None):
         d = DataLoader(input_data=self.args['data'], args=[])
         d.run()
         self.data = d.data
         print(self.data.keys())
 
-        control_pts = None
-        if self.args['npts']:
-            control_pts = control_pts_from_bounds(
-                    self.data['src'],
-                    self.args['npts'])
+        if control_pts is None:
+            if self.args['npts']:
+                control_pts = control_pts_from_bounds(
+                        self.data['src'],
+                        self.args['npts'])
 
         self.transform = Transform(
                 self.args['model'], control_pts=control_pts)
@@ -111,5 +127,5 @@ class Solve3D(argschema.ArgSchemaParser):
 
 
 if __name__ == '__main__':
-    smod = Solve3D(input_data=example)
+    smod = Solve3D(input_data=example1)
     smod.run()
