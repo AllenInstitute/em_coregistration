@@ -6,14 +6,14 @@ from .schemas import DataLoaderSchema
 example1 = {
         'landmark_file': './data/17797_2Pfix_EMmoving_20190405_PA_1724_merged.csv',
         'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
-        'actions': {'opty': 'invert'},
-        'sd_set': {'opt': 'src', 'em': 'dst'}
+        'actions': ['invert_opty'],
+        'sd_set': {'src': 'opt', 'dst': 'em'}
         }
 
 example2 = {
         'landmark_file': './data/animal_id-17797_session-9_stack_idx-19_pixel-centroids_pre-resize.csv',
         'header': ['optz', 'opty', 'optx'],
-        'sd_set': {'opt': 'src', 'em': 'dst'}
+        'sd_set': {'src': 'opt', 'dst': 'em'}
         }
 
 
@@ -36,17 +36,16 @@ class DataLoader(argschema.ArgSchemaParser):
             df = df[df['flag']]
 
         # invert y if specified
-        for k, v in self.args['actions'].items():
-            if (k == 'opty') & (v == 'invert'):
-                df[k] = (661 - df[k] / 0.002) * 0.002
+        if 'invert_opty' in self.args['actions']:
+            df['opty'] = (661 - df['opty'] / 0.002) * 0.002
 
         self.data = {}
         self.data['labels'] = df['label'].values
-        self.data['sd_set'] = self.args['sd_set']
-        for k in ['opt', 'em']:
-            a = [k + xyz for xyz in ['x', 'y', 'z']]
+        self.data['sd_set'] = dict(self.args['sd_set'])
+        for k in ['src', 'dst']:
+            a = [self.args['sd_set'][k] + xyz for xyz in ['x', 'y', 'z']]
             if set(a).issubset(set(df.columns)):
-                self.data[self.args['sd_set'][k]] = df[a].values
+                self.data[k] = df[a].values
 
 
 if __name__ == '__main__':
