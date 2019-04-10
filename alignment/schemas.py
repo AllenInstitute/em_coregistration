@@ -71,3 +71,17 @@ class SolverSchema(ArgSchema):
         missing=None,
         default=None,
         description="path for writing output json of transform")
+
+
+class DataFilterSchema(ArgSchema):
+    dset1 = Nested(DataLoaderSchema)
+    dset2 = Nested(DataLoaderSchema)
+    output_file = OutputFile(
+        required=False,
+        missing=None,
+        default=None,
+        description="where to write output file")
+    header = Str(
+        required=True,
+        default="opt",
+        description="specifies which data to use, i.e. opt/em")

@@ -35,9 +35,14 @@ class DataLoader(argschema.ArgSchemaParser):
         if 'flag' in df.columns:
             df = df[df['flag']]
 
-        # invert y if specified
+        # check specific actions
         if 'invert_opty' in self.args['actions']:
             df['opty'] = (661 - df['opty'] / 0.002) * 0.002
+
+        if 'opt_px_to_mm' in self.args['actions']:
+            for k in df.columns:
+                if 'opt' in k:
+                    df[k] *= 0.002
 
         self.data = {}
         self.data['labels'] = df['label'].values
