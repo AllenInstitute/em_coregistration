@@ -54,9 +54,9 @@ class DataFilter(argschema.ArgSchemaParser):
         self.logger.info("\nfiltered data has shape: {}".format(
             newdata.shape))
 
-        #newdata[:, 1] = (661 - newdata[:, 1] / 0.002) * 0.002
+        newdata[:, 1] = (661 - newdata[:, 1] / 0.002) * 0.002
 
-        np.savetxt(self.args['output_file'], newdata, fmt='%0.6f')
+        np.savetxt(self.args['output_file'], newdata, delimiter=',', fmt='%0.6f')
 
 
 if __name__ == '__main__':
