@@ -12,6 +12,12 @@ example = {
             'actions': ['invert_opty'],
             'sd_set': {'src': 'opt', 'dst': 'em'}
             },
+        'dset_soma': {
+            'landmark_file': './data/landmarks_somata_final.csv',
+            'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
+            'actions': ['invert_opty'],
+            'sd_set': {'src': 'opt', 'dst': 'em'}
+            },
         'dset2': {
             'landmark_file': './data/animal_id-17797_session-9_stack_idx-19_pixel-centroids_pre-resize.csv',
             'header': ['optz', 'opty', 'optx'],
@@ -44,19 +50,37 @@ class DataFilter(argschema.ArgSchemaParser):
             d2.data['src'].shape))
 
         hull = scipy.spatial.Delaunay(d1.data['src'])
-        inside = hull.find_simplex(d2.data['src']) >= 0
+        self.inside = hull.find_simplex(d2.data['src']) >= 0
 
-        newdata = d2.data['src'][inside]
+        k = 53598
+
+        self.newdata = d2.data['src'][self.inside]
+
+        dsoma = DataLoader(input_data=self.args['dset_soma'])
+        dsoma.run()
+
+        dists = scipy.spatial.distance.cdist(
+                dsoma.data['src'],
+                self.newdata)
+        print(dists.shape)
+        distmin = np.argmin(dists, axis=1)
+        print(distmin.shape)
+        print(distmin)
+        self.closest = self.newdata[distmin]
+
+        for i in range(self.newdata.shape[0]):
+            if np.all(np.isclose(d2.data['src'][k], self.newdata[i])):
+                print(i, self.newdata[i])
 
         self.logger.info("\nfiltered data spans: {} to {}".format(
-            newdata.min(axis=0),
-            newdata.max(axis=0)))
+            self.newdata.min(axis=0),
+            self.newdata.max(axis=0)))
         self.logger.info("\nfiltered data has shape: {}".format(
-            newdata.shape))
+            self.newdata.shape))
 
-        newdata[:, 1] = (661 - newdata[:, 1] / 0.002) * 0.002
+        #self.newdata[:, 1] = (661 - self.newdata[:, 1] / 0.002) * 0.002
 
-        np.savetxt(self.args['output_file'], newdata, delimiter=',', fmt='%0.6f')
+        np.savetxt(self.args['output_file'], self.newdata, delimiter=',', fmt='%0.6f')
 
 
 if __name__ == '__main__':

@@ -10,6 +10,7 @@ def linear_kernel(src, control_pts=None):
 
 
 def polynomial_kernel(src, control_pts=None):
+    A = np.zeros((src.shape[0], 10))
     A[:, 0] = 1.0 # offset
     A[:, 1:4] = src
     A[:, 4] = src[:, 0]**2 # x^2

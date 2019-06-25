@@ -75,6 +75,7 @@ class SolverSchema(ArgSchema):
 
 class DataFilterSchema(ArgSchema):
     dset1 = Nested(DataLoaderSchema)
+    dset_soma = Nested(DataLoaderSchema)
     dset2 = Nested(DataLoaderSchema)
     output_file = OutputFile(
         required=False,

@@ -7,7 +7,7 @@ import scipy
 
 example1 = {
         'data': {
-            'landmark_file': './data/17797_2Pfix_EMmoving_20190405_PA_1724_merged.csv',
+            'landmark_file' : './data/17797_2Pfix_EMmoving_20190414_PA_1018_Deliverable20180415.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
             'actions': ['invert_opty'],
             'sd_set': {'src': 'em', 'dst': 'opt'}
@@ -23,7 +23,7 @@ example1 = {
 }
 example2 = {
         'data': {
-            'landmark_file': './data/17797_2Pfix_EMmoving_20190405_PA_1724_merged.csv',
+            'landmark_file' : './data/17797_2Pfix_EMmoving_20190414_PA_1018_Deliverable20180415.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
             'actions': ['invert_opty'],
             'sd_set': {'src': 'opt', 'dst': 'em'}
@@ -79,6 +79,15 @@ def write_control_to_file(fpath, src, dst):
     out = np.hstack((src, dst))
     np.savetxt(fpath, out, fmt='%0.8e', delimiter=',')
     print('wrote %s' % fpath)
+
+
+def list_points_by_res_mag(res, labels, n=np.inf, factor=0.001):
+    mag = np.linalg.norm(res, axis=1)
+    ind = np.argsort(mag)[::-1]
+    i = 0
+    while (i < n) & (i < ind.size):
+        print('%10s, %0.1f' % (labels[ind][i], mag[ind][i] * factor))
+        i += 1
 
 
 class Solve3D(argschema.ArgSchemaParser):
