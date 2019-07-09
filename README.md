@@ -1,4 +1,4 @@
-# 3D_alignment
+# em_coregistration
 
 April 2019
 
