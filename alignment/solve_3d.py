@@ -9,7 +9,7 @@ example1 = {
         'data': {
             'landmark_file' : './data/17797_2Pfix_EMmoving_20190414_PA_1018_Deliverable20180415.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
-            'actions': ['invert_opty'],
+            'actions': ['invert_opty', 'em_nm_to_neurog'],
             'sd_set': {'src': 'em', 'dst': 'opt'}
         },
         'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json',
@@ -25,7 +25,7 @@ example2 = {
         'data': {
             'landmark_file' : './data/17797_2Pfix_EMmoving_20190414_PA_1018_Deliverable20180415.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
-            'actions': ['invert_opty'],
+            'actions': ['invert_opty', 'em_nm_to_neurog'],
             'sd_set': {'src': 'opt', 'dst': 'em'}
         },
         'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json',
@@ -228,4 +228,6 @@ class Solve3D(argschema.ArgSchemaParser):
 
 if __name__ == '__main__':
     smod = Solve3D(input_data=example1)
+    smod.run()
+    smod = Solve3D(input_data=example2)
     smod.run()
