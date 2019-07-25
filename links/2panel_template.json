@@ -1,0 +1,66 @@
+{
+  "layers": [
+    {
+      "tab": "annotations",
+      "selectedAnnotation": "data-bounds",
+      "source": "precomputed://gs://microns-seunglab/minnie_v4/alignment/fine/sergiy_multimodel_v1/vector_fixer30_faster_v01/image_stitch_multi_block_v1",
+      "type": "image",
+      "name": "Minnie65"
+    }
+  ],
+  "navigation": {
+    "pose": {
+      "position": {
+        "voxelSize": [
+          4,
+          4,
+          40
+        ],
+        "voxelCoordinates": [
+          177951.203125,
+          133872.71875,
+          24018
+        ]
+      }
+    },
+"zoomFactor": 100.0
+  },
+  "perspectiveOrientation": [
+    -0.17925526201725006,
+    0.1529591977596283,
+    -0.044681303203105927,
+    0.9708113074302673
+  ],
+  "perspectiveZoom": 200.3368099747919,
+  "jsonStateServer": "https://www.dynamicannotationframework.com/nglstate/post",
+  "layout": {
+    "type": "row",
+    "children": [
+      {
+        "type": "viewer",
+        "layers": [
+          "Minnie65"
+        ],
+        "layout": "4panel"
+      },
+      {
+        "type": "viewer",
+        "position": {
+          "link": "unlinked",
+          "value": {
+            "voxelCoordinates": [
+              177951.203125,
+              133872.71875,
+              24018
+            ]
+          }
+        },
+        "layers": [
+          "Minnie65"
+        ],
+        "layout": "4panel"
+      }
+    ]
+  }
+}
+
