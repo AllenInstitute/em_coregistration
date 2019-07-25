@@ -30,7 +30,8 @@ example = {
 
 
 class DataFilter(argschema.ArgSchemaParser):
-    # filters out dset2 data with the convex hull of dset1
+    """filters one dataset by the convex hull of another
+    """
     default_schema = DataFilterSchema
 
     def run(self):

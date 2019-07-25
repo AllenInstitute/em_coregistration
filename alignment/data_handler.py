@@ -18,6 +18,8 @@ example2 = {
 
 
 class DataLoader(argschema.ArgSchemaParser):
+    """class to load and manipulate different sources of data
+    """
     default_schema = DataLoaderSchema
 
     def run(self):
