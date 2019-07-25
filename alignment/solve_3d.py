@@ -16,9 +16,9 @@ example1 = {
         'model': 'TPS',
         'npts': 10,
         'regularization': {
-            'translation': 1e0,
-            'linear': 1e0,
-            'other': 1e-3
+            'translation': 1e-10,
+            'linear': 1e-10,
+            'other': 1e-10
             }
 }
 example2 = {
@@ -33,8 +33,8 @@ example2 = {
         'npts': 10,
         'regularization': {
             'translation': 1e-10,
-            'linear': 1e-3,
-            'other': 1e-3,
+            'linear': 1e-10,
+            'other': 1e-10,
             }
 }
 
