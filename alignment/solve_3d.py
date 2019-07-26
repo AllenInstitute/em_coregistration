@@ -9,16 +9,16 @@ example1 = {
         'data': {
             'landmark_file' : './data/17797_2Pfix_EMmoving_20190414_PA_1018_Deliverable20180415.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
-            'actions': ['invert_opty', 'em_nm_to_neurog'],
+            'actions': ['invert_opty'],
             'sd_set': {'src': 'em', 'dst': 'opt'}
         },
         'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json',
         'model': 'TPS',
         'npts': 10,
         'regularization': {
-            'translation': 1e-10,
-            'linear': 1e-10,
-            'other': 1e-10
+            'translation': 1e-15,
+            'linear': 1e-15,
+            'other': 1e-15,
             }
 }
 example2 = {
@@ -188,7 +188,6 @@ class Solve3D(argschema.ArgSchemaParser):
         d = DataLoader(input_data=self.args['data'], args=[])
         d.run()
         self.data = d.data
-        print(self.data.keys())
 
         if control_pts is None:
             if self.args['npts']:
@@ -221,7 +220,8 @@ class Solve3D(argschema.ArgSchemaParser):
                 self.data['dst'] -
                 self.transform.transform(self.data['src']))
 
-        print(np.linalg.norm(self.residuals, axis=1).mean())
+        print('average residual [dst units]: %0.4f' % (
+            np.linalg.norm(self.residuals, axis=1).mean()))
 
         self.output(self.transform.to_dict(), indent=2)
 

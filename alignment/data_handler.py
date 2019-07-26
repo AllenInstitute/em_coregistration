@@ -46,11 +46,6 @@ class DataLoader(argschema.ArgSchemaParser):
                 if 'opt' in k:
                     df[k] *= 0.002
 
-        if 'em_nm_to_neurog' in self.args['actions']:
-            df['emx'] = df['emx'] / 4 - 3072
-            df['emy'] = df['emy'] / 4 - 2560
-            df['emz'] = (df['emz']/960.) * 24 + 7924
-
         self.data = {}
         self.data['labels'] = df['label'].values
         self.data['sd_set'] = dict(self.args['sd_set'])
