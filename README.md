@@ -1,10 +1,7 @@
 # em_coregistration
 
-April 2019
-
-For the mm^3 EM data set and the functional data from Baylor
-
-(...maybe CT later ?)
+July 26, 2019
+For the IARPA Allen EM data Baylor 2P data
 
 tools for:
 - handling data from Baylor and Fiji Image stacks
