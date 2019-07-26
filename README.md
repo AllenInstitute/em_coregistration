@@ -45,7 +45,8 @@ One can get the residuals by comparing the last 2 outputs.
 
 The transform has also just been written to disk:
 ```
-> s1.args['output_json']                                                                                                      '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json'
+> s1.args['output_json']
+'/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json'
 ```
 
 You can use this later without re-doing the solve (though the solve is very fast):
