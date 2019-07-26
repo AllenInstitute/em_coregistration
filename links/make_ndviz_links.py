@@ -8,17 +8,9 @@ import numpy as np
 
 def nglink1(template_url, xyz, zoomFactor=100): 
     link = str(template_url) 
-    def xyz_tr(xyz): 
-        #x = int(xyz[0] / 8) + (3072 / 2) 
-        #y = int(xyz[1] / 8) + (2560 / 2) 
-        x = int(xyz[0] / 4) - 3072
-        y = int(xyz[1] / 4) - 2560
-        z = int((xyz[2]/960.) * 24) + 7924
-        return [x, y, z] 
-    x = xyz_tr(xyz) 
-    link = link.replace('XXX', '%d' % x[0]) 
-    link = link.replace('YYY', '%d' % x[1]) 
-    link = link.replace('ZZZ', '%d' % x[2]) 
+    link = link.replace('XXX', '%d' % xyz[0]) 
+    link = link.replace('YYY', '%d' % xyz[1]) 
+    link = link.replace('ZZZ', '%d' % xyz[2]) 
     link = link.replace('ZOOM', '%0.1f' % zoomFactor) 
     return link 
 
