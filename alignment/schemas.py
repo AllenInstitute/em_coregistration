@@ -55,6 +55,11 @@ class regularization(ArgSchema):
 class SolverSchema(ArgSchema):
     data = Nested(DataLoaderSchema)
     regularization = Nested(regularization)
+    leave_out_index = Int(
+        required=False,
+        missing=None,
+        default=None,
+        description="index to leave out of data")
     model = Str(
         required=False,
         default='TPS',
