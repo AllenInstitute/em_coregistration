@@ -7,7 +7,7 @@ import scipy
 
 example1 = {
         'data': {
-            'landmark_file' : './data/17797_2Pfix_EMmoving_20190414_PA_1018_Deliverable20180415.csv',
+            'landmark_file': './data/17797_2Pfix_EMmoving_20190910_1805.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
             'actions': ['invert_opty'],
             'sd_set': {'src': 'em', 'dst': 'opt'}
@@ -23,7 +23,7 @@ example1 = {
 }
 example2 = {
         'data': {
-            'landmark_file' : './data/17797_2Pfix_EMmoving_20190414_PA_1018_Deliverable20180415.csv',
+            'landmark_file': './data/17797_2Pfix_EMmoving_20190910_1805.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
             'actions': ['invert_opty', 'em_nm_to_neurog'],
             'sd_set': {'src': 'opt', 'dst': 'em'}
@@ -34,7 +34,7 @@ example2 = {
         'regularization': {
             'translation': 1e-10,
             'linear': 1e-10,
-            'other': 1e-10,
+            'other': 1e10,
             }
 }
 
