@@ -45,11 +45,11 @@ def linear_kernel(src, control_pts=None):
     Returns
     -------
     A : :class:`numpy.ndarray`
-        npts x 4 array 
+        npts x 4 array
 
     """
     A = np.zeros((src.shape[0], 4))
-    A[:, 0] = 1.0 # offset
+    A[:, 0] = 1.0  # offset
     A[:, 1:4] = src
     return A
 
@@ -68,22 +68,22 @@ def polynomial_kernel(src, control_pts=None):
     Returns
     -------
     A : :class:`numpy.ndarray`
-        npts x 10 array 
+        npts x 10 array
 
     """
     A = np.zeros((src.shape[0], 10))
-    A[:, 0] = 1.0 # offset
+    A[:, 0] = 1.0  # offset
     A[:, 1:4] = src
-    A[:, 4] = src[:, 0]**2 # x^2
-    A[:, 5] = src[:, 1]**2 # y^2
-    A[:, 6] = src[:, 2]**2 # z^2
-    A[:, 7] = src[:, 0] * src[:, 1] # xy
-    A[:, 8] = src[:, 0] * src[:, 2] # xz
-    A[:, 9] = src[:, 1] * src[:, 2] # yz
+    A[:, 4] = src[:, 0]**2  # x^2
+    A[:, 5] = src[:, 1]**2  # y^2
+    A[:, 6] = src[:, 2]**2  # z^2
+    A[:, 7] = src[:, 0] * src[:, 1]  # xy
+    A[:, 8] = src[:, 0] * src[:, 2]  # xz
+    A[:, 9] = src[:, 1] * src[:, 2]  # yz
     return A
 
 
-def thin_plate_kernel(src, control_pts=None, old=False):
+def thin_plate_kernel(src, control_pts=None):
     """thin plate spline kernel, including affine
 
     Parameters
@@ -102,24 +102,36 @@ def thin_plate_kernel(src, control_pts=None, old=False):
 
     """
     A = np.zeros((src.shape[0], 4 + control_pts.shape[0]))
-    A[:, 0] = 1.0 # offset
-    A[:, 1:4] = src # affine
-    if old:
-        # this was a mistake, using the 2D solution to the biharmonic
-        disp = scipy.spatial.distance.cdist(
-            src,
-            control_pts,
-            metric='sqeuclidean')
-        disp *= np.ma.log(np.sqrt(disp)).filled(0.0)
-        A[:, 4:] = disp
-    else:
-        # in 3 dimensions, the solution to the biharmonic
-        A[:, 4:] = np.abs(
-                scipy.spatial.distance.cdist(
-                    src,
-                    control_pts,
-                    metric='euclidean'))
+    A[:, 0] = 1.0  # offset
+    A[:, 1:4] = src  # affine
+    # in 3 dimensions, the solution to the biharmonic
+    A[:, 4:] = np.abs(
+            scipy.spatial.distance.cdist(
+                src,
+                control_pts,
+                metric='euclidean'))
+
     return A
+
+
+def chunked_kernel(src, nz=21, zr=None, axis='z'):
+    nax = ['x', 'y', 'z'].index(axis)
+
+    if zr is None:
+        zr = np.linspace(src[:, nax].min(), src[:, nax].max(), nz)
+        zr[0] -= zr.ptp() * 0.01
+        zr[-1] += zr.ptp() * 0.01
+
+    A = np.zeros((src.shape[0], 10 * (zr.size - 1)))
+    nrow = 0
+    for s in src:
+        for i in range(zr.size - 1):
+            if (s[nax] > zr[i]) & (s[nax] <= zr[i + 1]):
+                A[nrow, (i * 10):(i * 10 + 10)] = \
+                        polynomial_kernel(s.reshape(1, -1))
+                nrow += 1
+                break
+    return A, zr
 
 
 class Transform():
@@ -128,11 +140,13 @@ class Transform():
        and desrialization functions.
     """
 
-    def __init__(self, model, control_pts=None):
+    def __init__(self, model, control_pts=None, nz=21, axis='z'):
         self.control_pts = control_pts
         self.model = model
+        self.nz = nz
+        self.axis = axis
 
-    def kernel(self, src):
+    def kernel(self, src, zr=None, tri=None):
         """matrix kernel from this Transform object
 
         Parameters
@@ -149,12 +163,13 @@ class Transform():
 
         if self.model == 'LIN':
             return linear_kernel(src)
+        if self.model == 'ZCHUNKED':
+            A, self.zr = chunked_kernel(src, nz=self.nz, zr=zr, axis=self.axis)
+            return A
         elif self.model == 'POLY':
             return polynomial_kernel(src)
         elif self.model == 'TPS':
             return thin_plate_kernel(src, self.control_pts)
-        elif self.model == 'TPS-wrong':
-            return thin_plate_kernel(src, self.control_pts, old=True)
 
     def load_parameters(self, x):
         """set the parameters of this Transform so that
@@ -182,7 +197,13 @@ class Transform():
             ndata x 3 transformed Cartesian coordinates
 
         """
-        k = self.kernel(src)
+
+        if self.model == 'ZCHUNKED':
+            k = self.kernel(src, zr=self.zr)
+        elif self.model == 'PIECEWISE':
+            k = self.kernel(src, tri=self.tri)
+        else:
+            k = self.kernel(src)
         dst = np.zeros_like(src)
         for i in range(src.shape[1]):
             dst[:, i] = k.dot(self.parameters[:, i])
@@ -214,3 +235,14 @@ class Transform():
         self.model = j['model']
         self.parameters = np.array(j['parameters'])
         self.control_pts = np.array(j['control_pts'])
+
+
+class StagedTransform():
+    def __init__(self, tflist):
+        self.tflist = tflist
+
+    def transform(self, coords):
+        x = np.copy(coords)
+        for tf in self.tflist:
+            x = tf.transform(x)
+        return x
