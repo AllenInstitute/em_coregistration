@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -q emconnectome
+#PBS -l mem=250g
+#PBS -n
+#PBS -l walltime=4:30:00
+#PBS -N coregistration
+#PBS -j oe
+#PBS -o /allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration
+
+module load anaconda
+
+source activate /allen/programs/celltypes/workgroups/em-connectomics/danielk/conda/coregistration
+
+cd /allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration
+
+python leave_one_out.py

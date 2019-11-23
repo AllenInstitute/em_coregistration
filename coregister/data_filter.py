@@ -7,7 +7,7 @@ import logging
 
 example = {
         'dset1': {
-            'landmark_file': './data/17797_2Pfix_EMmoving_20190405_PA_1724_merged.csv',
+            'landmark_file': './data/17797_2Pfix_EMmoving_20190910_1805.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
             'actions': ['invert_opty'],
             'sd_set': {'src': 'opt', 'dst': 'em'}
@@ -19,12 +19,12 @@ example = {
             'sd_set': {'src': 'opt', 'dst': 'em'}
             },
         'dset2': {
-            'landmark_file': './data/animal_id-17797_session-9_stack_idx-19_pixel-centroids_pre-resize.csv',
-            'header': ['optz', 'opty', 'optx'],
+            'landmark_file': './data/animal_id-17797_session-9_stack_idx-19_pixel-centroids_pre-resize_labeled.csv',
+            'header': ['label', 'optz', 'opty', 'optx'],
             'actions': ['opt_px_to_mm'],
             'sd_set': {'src': 'opt', 'dst': 'em'}
             },
-        'output_file': './data/animal_id-17797_session-9_stack_idx-19_pixel-centroids_pre-resize_filtered.csv',
+        'output_file': './data/animal_id-17797_session-9_stack_idx-19_pixel-centroids_pre-resize_labeled_filtered.csv',
         'header': 'opt',
         }
 
@@ -55,33 +55,41 @@ class DataFilter(argschema.ArgSchemaParser):
 
         k = 53598
 
-        self.newdata = d2.data['src'][self.inside]
+        print(d2.data.keys())
+
+        self.newdata = {
+                'src': d2.data['src'][self.inside],
+                'labels': d2.data['labels'][self.inside]
+                }
 
         dsoma = DataLoader(input_data=self.args['dset_soma'])
         dsoma.run()
 
         dists = scipy.spatial.distance.cdist(
                 dsoma.data['src'],
-                self.newdata)
-        print(dists.shape)
+                self.newdata['src'])
         distmin = np.argmin(dists, axis=1)
-        print(distmin.shape)
-        print(distmin)
-        self.closest = self.newdata[distmin]
+        self.closest = self.newdata['src'][distmin]
 
-        for i in range(self.newdata.shape[0]):
-            if np.all(np.isclose(d2.data['src'][k], self.newdata[i])):
-                print(i, self.newdata[i])
+        self.logger.setLevel('INFO')
+        for i in range(self.newdata['src'].shape[0]):
+            if np.all(np.isclose(d2.data['src'][k], self.newdata['src'][i])):
+                print(i, self.newdata['src'][i])
 
         self.logger.info("\nfiltered data spans: {} to {}".format(
-            self.newdata.min(axis=0),
-            self.newdata.max(axis=0)))
+            self.newdata['src'].min(axis=0),
+            self.newdata['src'].max(axis=0)))
         self.logger.info("\nfiltered data has shape: {}".format(
-            self.newdata.shape))
+            self.newdata['src'].shape))
 
         #self.newdata[:, 1] = (661 - self.newdata[:, 1] / 0.002) * 0.002
 
-        np.savetxt(self.args['output_file'], self.newdata, delimiter=',', fmt='%0.6f')
+        nt = np.hstack((
+            self.newdata['labels'].reshape(-1, 1),
+            self.newdata['src']))
+
+        np.savetxt(self.args['output_file'], nt, delimiter=',', fmt=['%d','%0.6f', '%0.6f','%0.6f'])
+        self.logger.info("\nwrote {}".format(self.args['output_file']))
 
 
 if __name__ == '__main__':

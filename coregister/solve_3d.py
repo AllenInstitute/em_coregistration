@@ -6,40 +6,45 @@ import numpy as np
 import scipy
 
 example1 = {
+        'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json',
         'data': {
-            'landmark_file' : './data/17797_2Pfix_EMmoving_20190414_PA_1018_Deliverable20180415.csv',
+            'landmark_file': './data/17797_2Pfix_EMmoving_20190910_1805.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
             'actions': ['invert_opty'],
             'sd_set': {'src': 'em', 'dst': 'opt'}
         },
-        'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json',
-        'model': 'TPS',
-        'npts': 10,
-        'regularization': {
-            'translation': 1e-15,
-            'linear': 1e-15,
-            'other': 1e-15,
-            }
+        "transform": {
+            'model': 'TPS',
+            'npts': 10,
+            'regularization': {
+                'translation': 1e-15,
+                'linear': 1e-15,
+                'other': 1e-15,
+                }
+        }
 }
+
 example2 = {
+        'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json',
         'data': {
-            'landmark_file' : './data/17797_2Pfix_EMmoving_20190414_PA_1018_Deliverable20180415.csv',
+            'landmark_file': './data/17797_2Pfix_EMmoving_20190910_1805.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
             'actions': ['invert_opty', 'em_nm_to_neurog'],
             'sd_set': {'src': 'opt', 'dst': 'em'}
         },
-        'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json',
-        'model': 'TPS',
-        'npts': 10,
-        'regularization': {
-            'translation': 1e-10,
-            'linear': 1e-10,
-            'other': 1e-10,
-            }
+        "transform": {
+            'model': 'TPS',
+            'npts': 10,
+            'regularization': {
+                'translation': 1e-10,
+                'linear': 1e-10,
+                'other': 1e10,
+                }
+        }
 }
 
 
-def control_pts_from_bounds(data, npts):
+def control_pts_from_bounds(data, npts, bounds_buffer=0):
     """create thin plate spline control points
     from the bounds of provided data.
 
@@ -47,9 +52,10 @@ def control_pts_from_bounds(data, npts):
     ----------
     data : :class:`numpy.ndarray`
         ndata x 3 Cartesian coordinates of data.
-    npts : int
+    npts : list
+        [nx, ny, nz]
         number of control points per axis. total
-        number of control points will be npts^3
+        number of control points will be nx * ny * nz
 
     Returns
     -------
@@ -58,7 +64,10 @@ def control_pts_from_bounds(data, npts):
 
     """
     x, y, z = [
-            np.linspace(data[:, i].min(), data[:, i].max(), npts)
+            np.linspace(
+                data[:, i].min() - bounds_buffer,
+                data[:, i].max() + bounds_buffer,
+                npts[i])
             for i in [0, 1, 2]]
     xt, yt, zt = np.meshgrid(x, y, z)
     control_pts = np.vstack((
@@ -144,7 +153,6 @@ def write_src_dst_to_file(fpath, src, dst):
     """
     out = np.hstack((src, dst))
     np.savetxt(fpath, out, fmt='%0.8e', delimiter=',')
-    print('wrote %s' % fpath)
 
 
 def list_points_by_res_mag(res, labels, n=np.inf, factor=0.001):
@@ -208,16 +216,26 @@ class Solve3D(argschema.ArgSchemaParser):
         d.run()
         self.data = d.data
 
-
-        if control_pts is None:
-            if self.args['npts']:
-                control_pts = control_pts_from_bounds(
-                        self.data['src'],
-                        self.args['npts'])
         self.data, self.left_out = leave_out(self.data, self.args['leave_out_index'])
 
+        if control_pts is None:
+            if self.args['transform']['npts']:
+                print(self.args['transform']['npts'])
+                if np.all(np.array(self.args['transform']['npts']) == -1):
+                    print('ok')
+                    control_pts = np.copy(self.data['src'])
+                else:
+                    control_pts = control_pts_from_bounds(
+                            self.data['src'],
+                            self.args['transform']['npts'],
+                            bounds_buffer=self.args['transform']['bounds_buffer'])
+
+        nz = None
+        if 'nz' in self.args['transform'].keys():
+            nz = self.args['transform']['nz']
+
         self.transform = Transform(
-                self.args['model'], control_pts=control_pts)
+                self.args['transform']['model'], nz=nz, control_pts=control_pts, axis=self.args['transform']['axis'])
 
         # unit weighting per point
         self.wts = np.eye(self.data['src'].shape[0])
@@ -225,7 +243,7 @@ class Solve3D(argschema.ArgSchemaParser):
         self.A = self.transform.kernel(self.data['src'])
 
         self.reg = create_regularization(
-                self.A.shape[1], self.args['regularization'])
+                self.A.shape[1], self.args['transform']['regularization'])
 
         # solve the system of equations
         self.x = solve(

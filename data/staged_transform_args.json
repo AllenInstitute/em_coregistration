@@ -1,0 +1,90 @@
+{
+        "data": {
+            "landmark_file": "data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Master.csv",
+            "header": ["label", "flag", "emx", "emy", "emz", "optx", "opty", "optz"],
+            "actions": ["invert_opty", "em_nm_to_neurog"],
+            "sd_set": {"src": "opt", "dst": "em"},
+            "exclude_labels": [60000, 60001]
+        },
+        "transforms": [
+            {
+                "model": "POLY",
+                "npts": 10,
+                "regularization": {
+                    "translation": 1e-15,
+                    "linear": 1e-10,
+                    "other": 1e-2
+                    }
+            },
+            {
+                "model": "ZCHUNKED",
+                "bounds_buffer": 1.0,
+                "npts": [5, 5, 20],
+                "regularization": {
+                    "translation": 1e-10,
+                    "linear": 1e-10,
+                    "other": 1e-10
+                    },
+                "nz": 5,
+                "axis": "z"
+            },
+            {
+                "model": "ZCHUNKED",
+                "bounds_buffer": 1.0,
+                "npts": [5, 5, 20],
+                "regularization": {
+                    "translation": 1e-10,
+                    "linear": 1e-10,
+                    "other": 1e-10
+                    },
+                "nz": 21,
+                "axis": "z"
+            },
+            {
+                "model": "TPS",
+                "npts": [3, 3, 3],
+                "regularization": {
+                    "translation": 1e-6,
+                    "linear": 1e-6,
+                    "other": 1e10
+                    }
+            },
+            {
+                "model": "TPS",
+                "npts": [5, 5, 5],
+                "regularization": {
+                    "translation": 1e-6,
+                    "linear": 1e-6,
+                    "other": 1e10
+                    }
+            },
+            {
+                "model": "TPS",
+                "npts": [10, 10, 10],
+                "regularization": {
+                    "translation": 1e-6,
+                    "linear": 1e-6,
+                    "other": 1e10
+                    }
+            },
+            {
+                "model": "TPS",
+                "npts": [12, 12, 12],
+                "regularization": {
+                    "translation": 1e-6,
+                    "linear": 1e-6,
+                    "other": 1e10
+                    }
+            },
+            {
+                "model": "TPS",
+                "npts": [-1, -1, -1],
+                "regularization": {
+                    "translation": 1e-6,
+                    "linear": 1e-6,
+                    "other": 1e5
+                    }
+            }
+            ]
+        }
+
