@@ -61,7 +61,7 @@ Running this can be time-consuming:
 ::
     python leave_one_out.py
 
-For testing, one can change the leave-out fraction inside the file to something smaller than 1 (for example 0.002 will jsut run a few). I tend to run it on a cluster node. See coreg.pbs.
+For testing, one can change the leave-out fraction inside the file to something smaller than 1 (for example 0.002 will run just a few). I tend to run it on a cluster node. See coreg.pbs.
 
 .. The neuroglancer voxels are anisotropic, but the Fiji coordinates are isotropic. It is easier to just solve and transform in isotropic coordinates. From the transform results, it is an additional step to go to voxels:
    ::
