@@ -6,7 +6,6 @@
             "sd_set": {"src": "opt", "dst": "em"},
             "exclude_labels": [60000, 60001]
         },
-        "output_json": "/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json",
         "transforms": [
             {
                 "model": "POLY",
