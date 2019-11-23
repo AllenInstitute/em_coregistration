@@ -73,7 +73,6 @@ class StagedSolve(argschema.ArgSchemaParser):
         for si, s in enumerate(self.solves):
             if s.transform.control_pts is not None:
                 csrc = s.transform.control_pts
-                print('control pts shape: ', csrc.shape)
                 cdst = s.transform.transform(csrc)
                 delta = cdst - csrc
                 self.avdelta = np.linalg.norm(delta, axis=1).mean() * 0.001

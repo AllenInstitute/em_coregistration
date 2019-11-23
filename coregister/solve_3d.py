@@ -6,7 +6,7 @@ import numpy as np
 import scipy
 
 example1 = {
-        'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json',
+        'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/transform.json',
         'data': {
             'landmark_file': './data/17797_2Pfix_EMmoving_20190910_1805.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
@@ -25,7 +25,7 @@ example1 = {
 }
 
 example2 = {
-        'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json',
+        'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/transform.json',
         'data': {
             'landmark_file': './data/17797_2Pfix_EMmoving_20190910_1805.csv',
             'header': ['label', 'flag', 'emx', 'emy', 'emz', 'optx', 'opty', 'optz'],
@@ -173,6 +173,7 @@ def list_points_by_res_mag(res, labels, n=np.inf, factor=0.001):
     mag = np.linalg.norm(res, axis=1)
     ind = np.argsort(mag)[::-1]
     i = 0
+    print('worst points:')
     while (i < n) & (i < ind.size):
         print('%10s, %0.1f' % (labels[ind][i], mag[ind][i] * factor))
         i += 1
@@ -220,9 +221,7 @@ class Solve3D(argschema.ArgSchemaParser):
 
         if control_pts is None:
             if self.args['transform']['npts']:
-                print(self.args['transform']['npts'])
                 if np.all(np.array(self.args['transform']['npts']) == -1):
-                    print('ok')
                     control_pts = np.copy(self.data['src'])
                 else:
                     control_pts = control_pts_from_bounds(

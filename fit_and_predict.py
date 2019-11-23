@@ -13,6 +13,7 @@ s = StagedSolve(input_data=copy.deepcopy(args), args=[])
 s.run()
 
 rlist = s.sorted_labeled_residuals()
+print('worst points')
 for r in rlist[0:10]:
     print("%10s %10.1f" % (r[0], r[1]))
 
