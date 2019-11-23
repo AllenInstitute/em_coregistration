@@ -1,60 +1,60 @@
-import staged_solve as s
+from alignment.staged_solve import StagedSolve
+from alignment.data_handler import DataLoader
+import multiprocessing
 import numpy as np
 import copy
-import multiprocessing
 import os
+import json
+
+leave_out_frac = 1.0
+
+with open("./data/staged_transform_args.json", "r") as f:
+    args = json.load(f)
 
 
-def job(fargs):
-    i, nc = fargs
-    #s = s3.Solve3D(
-    #        input_data=copy.deepcopy(s3.example2),
-    #        args=['--leave_out_index', '%d' % i, '--npts', '%d' % nc]) 
-    #s.run()
-    #res = s.left_out['dst'] - s.transform.transform(s.left_out['src'])
-    args_poly = copy.deepcopy(s3.example1)
-    args_poly['model'] = 'POLY'
-    s_poly = s3.Solve3D(input_data=args_poly, args=['--leave_out_index', '%d' % i])
-    s_poly.run()
-    tf_poly = s_poly.transform
-    rng = np.random.RandomState(i)
-    d = rng.randint(0, 1e6)
-    tmp_path = './tmp_%d.csv' % d
-    s3.write_src_dst_to_file(
-            tmp_path,
-            tf_poly.transform(s_poly.data['src']),
-            s_poly.data['dst'])
-
-    args_tps = copy.deepcopy(s3.example1)
-    args_tps['model'] = 'TPS'
-    args_tps['npts'] = nc
-    args_tps['data'] = {
-            'landmark_file': tmp_path,
-            'header': ['polyx', 'polyy', 'polyz', 'optx', 'opty', 'optz'],
-            'sd_set': {'src': 'poly', 'dst': 'opt'}
+def solve_job(args):
+    s = StagedSolve(input_data=args, args=[])
+    s.run()
+    res = {
+            s.leave_out_label: {
+                'leave_out_rmag': s.leave_out_rmag,
+                'leave_out_res': s.leave_out_res,
+                'avdelta_cntrl': s.avdelta,
+                'leave_in_res': np.linalg.norm(s.residuals, axis=1).mean()
+                }
             }
-    args_tps['regularization']['other'] = 1e-5
-    s_tps = s3.Solve3D(input_data=args_tps, args=[])
-    s_tps.run()
-    tf_tps = s_tps.transform
-    tf_total = StagedTransform([tf_poly, tf_tps])
+    return res
 
-    res = s_poly.left_out['dst'] - tf_total.transform(s_poly.left_out['src'])
-    os.remove(tmp_path)
-    return s_poly.left_out['labels'][0], np.linalg.norm(res[0]), np.linalg.norm(s_tps.residuals, axis=1).mean()
 
-leave_out_res = {}
+def leave_one_out(args, nmax, n):
+    ind = np.arange(nmax)
+    np.random.shuffle(ind)
+    ind = ind[0: n]
 
-allres = []
-allk = [10]
-lores = []
-for k in allk:
-    args = [(i, k) for i in range(1736)]
-    #args = [(i, k) for i in range(100)]
-    pool = multiprocessing.Pool(8)
-    results = []
-    for r in pool.imap(job, args, chunksize=100):
-        results.append(r)
-    allres.append(np.array([i[2] for i in results]).mean())
-    lores.append(np.array([i[1] for i in results]).mean())
+    allargs = []
+    for i in ind:
+        allargs.append(copy.deepcopy(args))
+        allargs[-1]['leave_out_index'] = i
 
+    pool = multiprocessing.Pool(4)
+    results = pool.map(solve_job, allargs, chunksize=50)
+
+    loo = {}
+    for r in results:
+        loo.update(r)
+
+    return loo
+
+
+data = DataLoader(input_data=copy.deepcopy(args['data']), args=[])
+data.run()
+nmax = data.data['src'].shape[0]
+loo = leave_one_out(args, nmax, int(nmax * leave_out_frac))
+
+loo_name = os.path.join(
+        os.path.dirname(args['data']['landmark_file']),
+        os.path.splitext(
+            os.path.basename(args['data']['landmark_file']))[0] +
+        '_leave_outs.json')
+with open(loo_name, 'w') as f:
+    json.dump(loo, f, indent=2)
