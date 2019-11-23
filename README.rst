@@ -22,121 +22,78 @@ Supported by the Intelligence Advanced Research Projects Activity (IARPA) via De
 User Guide
 ##########
 
-using Ipython from the root dir of this repo:
+from the root dir of this repo (or anywhere if installed):
 ::
-   import coregister.solve_3d as s3
-   s1 = s3.Solve3D(input_data=s3.example1, args=[])
-   s1.run()
+   python fit_and_predict.py
 
-   average residual [dst units]: 0.0023
+   average residual [dst units]: 10803.2841
+   average residual [dst units]: 5626.8712
+   average residual [dst units]: 4696.0970
+   average residual [dst units]: 3975.3966
+   average residual [dst units]: 3480.0259
+   average residual [dst units]: 3053.2877
+   average residual [dst units]: 2877.6895
+   average residual [dst units]: 3.0340
+   transform 0 control points moved average of 1407.9um
+   transform 1 control points moved average of 18.0um
+   transform 2 control points moved average of 6.6um
+   transform 3 control points moved average of 12.5um
+   transform 4 control points moved average of 7.5um
+   transform 5 control points moved average of 3.8um
+   transform 6 control points moved average of 1.6um
+   transform 7 control points moved average of 2.9um
+   worst points
+      Pt-1729      134.9
+      Pt-3159      134.3
+      Pt-2155      124.4
+      Pt-1610      124.1
+      Pt-3094      116.6
+       Pt-415      116.5
+      Pt-2138      109.9
+      Pt-2136      109.0
+      Pt-3782       87.2
+      Pt-1024       86.8
+   wrote data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Master_updated.csv
 
-this just solved for example1 in alignment/solve_3d. The source (moving) = EM, the destination (fixed) is optical. The average residual is 2.3um.
+this just performed a staged solve, showing residuals and control point motions for the specified transform steps. Refer to fit_and_predict.py for more details.
 
-Some of the data for this example:
+Running this can be time-consuming:
 ::
-   s1.data['src'][0:4]
+    python leave_one_out.py
 
-   array([[1172669.371 ,  717762.7498,  282148.7913],
-          [1391713.009 ,  593754.4669,  337574.0701],
-          [1382783.763 ,  759141.8597,  366487.6834],
-          [1287230.575 ,  508049.4798,  321659.1986]])
-   
-   s1.data['dst'][0:4]
+For testing, one can change the leave-out fraction inside the file to something smaller than 1 (for example 0.002 will jsut run a few). I tend to run it on a cluster node. See coreg.pbs.
 
-   array([[0.80435367, 0.38783457, 0.27464807],
-          [0.86919081, 0.13852442, 0.15631878],
-          [0.89353762, 0.18544056, 0.36127396],
-          [0.85027004, 0.25735289, 0.06735198]])
-
-The result of the transform:
-::
-   s1.transform.transform(s1.data['src'])[0:4]
-
-   array([[0.80430773, 0.38744583, 0.2744871 ],
-          [0.86856248, 0.14021783, 0.15375644],
-          [0.89270374, 0.18248724, 0.358625  ],
-          [0.85024923, 0.25737231, 0.06724511]])
-
-One can get the residuals by comparing the last 2 outputs.
-
-The transform has also just been written to disk:
-::
-   s1.args['output_json']
-
-   '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/transform.json'
-
-You can use this later without re-doing the solve (though the solve is very fast):
-::
-   from coregister.transform import Transform
-   import json
-   t = Transform(model='TPS')
-   with open(s1.args['output_json'], 'r') as f:
-       t.from_dict(json.load(f))
-   t.transform(s1.data['src'])[0:4]
-
-   array([[0.80430773, 0.38744583, 0.2744871 ],
-          [0.86856248, 0.14021783, 0.15375644],
-          [0.89270374, 0.18248724, 0.358625  ],
-          [0.85024923, 0.25737231, 0.06724511]])
-
-Going the other way (optical to EM):
-::
-   s2 = s3.Solve3D(input_data=s3.example2, args=[])
-   s2.run()
-
-   average residual [dst units]: 1608.6795
-
-The residuals are better in this direction... not exactly sure why. It could be where the control points get set up. Same deal, you can read this transform from disk:
-::
-   t = Transform(model='TPS')
-   with open(s2.args['output_json'], 'r') as f: 
-       t.from_dict(json.load(f))
-   t.transform(s2.data['src'])[0:4]
-
-   array([[1173037.06239277,  717944.16524402,  281592.01954812],
-          [1392944.86317897,  590682.87649827,  338896.28718442],
-          [1378151.60056365,  761835.79200597,  367174.83412847],
-          [1287215.11926234,  507937.83934919,  321698.63528779]])
-
-   s2.data['dst'][0:4]
-
-   array([[1172669.371 ,  717762.7498,  282148.7913],
-          [1391713.009 ,  593754.4669,  337574.0701],
-          [1382783.763 ,  759141.8597,  366487.6834],
-          [1287230.575 ,  508049.4798,  321659.1986]])
-
-Looks pretty good...
-
-The neuroglancer voxels are anisotropic, but the Fiji coordinates are isotropic. It is easier to just solve and transform in isotropic coordinates. From the transform results, it is an additional step to go to voxels:
-::
-   from coregister.transform import em_nm_to_voxels
-   em_nm_to_voxels(s2.data['dst'])[0:4]
-
-   array([[290095, 176880,  14977],
-          [344856, 145878,  16363],
-          [342623, 187225,  17086],
-          [318735, 124452,  15965]])
-
-you can go backwards also:
-::
-   em_nm_to_voxels(em_nm_to_voxels(s2.data['dst']), inverse=True)[0:4]
-
-   array([[1172668.,  717760.,  282120.],
-          [1391712.,  593752.,  337560.],
-          [1382780.,  759140.,  366480.],
-          [1287228.,  508048.,  321640.]])
-
-There is a not-so-smooth way to make a neuroglancer link:
-::
-   from links.make_ndviz_links import nglink1, example
-   vox = em_nm_to_voxels(s2.data['dst'])[0:4]
-   vox
-
-   array([[290095, 176880,  14977],
-          [344856, 145878,  16363],
-          [342623, 187225,  17086],
-          [318735, 124452,  15965]])
-
-   print(nglink1(example['template_url'], vox[0]))
-
-   https://neuromancer-seung-import.appspot.com/#!{"layers":[{"tab":"annotations","selectedAnnotation":"data-bounds","source":"precomputed://gs://microns-seunglab/minnie_v4/alignment/fine/sergiy_multimodel_v1/vector_fixer30_faster_v01/image_stitch_multi_block_v1","type":"image","name":"Minnie65"}],"navigation":{"pose":{"position":{"voxelSize":[4,4,40],"voxelCoordinates":[290095, 176880, 14977]}},"zoomFactor":100.0},"jsonStateServer":"https://www.dynamicannotationframework.com/nglstate/post","layout":"4panel"}
+..The neuroglancer voxels are anisotropic, but the Fiji coordinates are isotropic. It is easier to just solve and transform in isotropic coordinates. From the transform results, it is an additional step to go to voxels:
+  ::
+     from coregister.transform import em_nm_to_voxels
+  
+     em_nm_to_voxels(s2.data['dst'])[0:4]
+  
+     array([[290095, 176880,  14977],
+            [344856, 145878,  16363],
+            [342623, 187225,  17086],
+            [318735, 124452,  15965]])
+  
+  you can go backwards also:
+  ::
+     em_nm_to_voxels(em_nm_to_voxels(s2.data['dst']), inverse=True)[0:4]
+  
+     array([[1172668.,  717760.,  282120.],
+            [1391712.,  593752.,  337560.],
+            [1382780.,  759140.,  366480.],
+            [1287228.,  508048.,  321640.]])
+  
+  There is a not-so-smooth way to make a neuroglancer link:
+  ::
+     from links.make_ndviz_links import nglink1, example
+     vox = em_nm_to_voxels(s2.data['dst'])[0:4]
+     vox
+  
+     array([[290095, 176880,  14977],
+            [344856, 145878,  16363],
+            [342623, 187225,  17086],
+            [318735, 124452,  15965]])
+  
+     print(nglink1(example['template_url'], vox[0]))
+  
+     https://neuromancer-seung-import.appspot.com/#!{"layers":[{"tab":"annotations","selectedAnnotation":"data-bounds","source":"precomputed://gs://microns-seunglab/minnie_v4/alignment/fine/sergiy_multimodel_v1/vector_fixer30_faster_v01/image_stitch_multi_block_v1","type":"image","name":"Minnie65"}],"navigation":{"pose":{"position":{"voxelSize":[4,4,40],"voxelCoordinates":[290095, 176880, 14977]}},"zoomFactor":100.0},"jsonStateServer":"https://www.dynamicannotationframework.com/nglstate/post","layout":"4panel"}
