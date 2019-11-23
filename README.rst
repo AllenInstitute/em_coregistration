@@ -2,6 +2,7 @@ em_coregistration
 #################
 
 tools for:
+
 - handling data from Baylor and Fiji Image stacks
 - performing a 3D alignment solve between landmarks
 - transforming points based on a 3D solve result
