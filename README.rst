@@ -6,8 +6,21 @@ tools for:
 - performing a 3D alignment solve between landmarks
 - transforming points based on a 3D solve result
 - create neuroglancer links for checking visualization
+ 
+support
+#######
 
-# User Guide
+We are not currently supporting this code, but simply releasing it to the community AS IS but are not able to provide any guarantees of support, as it is under active development. The community is welcome to submit issues, but you should not expect an active response.
+
+Acknowledgement of Government Sponsorship
+#########################################
+
+Supported by the Intelligence Advanced Research Projects Activity (IARPA) via Department of Interior / Interior Business Center (DoI/IBC) contract number D16PC00004. The U.S. Government is authorized to reproduce and distribute reprints for Governmental purposes notwithstanding any copyright annotation thereon. Disclaimer: The views and conclusions contained herein are those of the authors and should not be interpreted as necessarily representing the official policies or endorsements, either expressed or implied, of IARPA, DoI/IBC, or the U.S. Government.
+
+
+User Guide
+##########
+
 using Ipython from the root dir of this repo:
 
 .. codeblock:: python
@@ -20,19 +33,22 @@ this just solved for example1 in alignment/solve_3d. The source (moving) = EM, t
 
 Some of the data for this example:
 .. codeblock::
-   > s1.data['src'][0:4]                                                                                                         array([[1172669.371 ,  717762.7498,  282148.7913],
+   > s1.data['src'][0:4]
+   array([[1172669.371 ,  717762.7498,  282148.7913],
           [1391713.009 ,  593754.4669,  337574.0701],
           [1382783.763 ,  759141.8597,  366487.6834],
           [1287230.575 ,  508049.4798,  321659.1986]])
    
-   > s1.data['dst'][0:4]                                                                                                         array([[0.80435367, 0.38783457, 0.27464807],
+   > s1.data['dst'][0:4]
+   array([[0.80435367, 0.38783457, 0.27464807],
           [0.86919081, 0.13852442, 0.15631878],
           [0.89353762, 0.18544056, 0.36127396],
           [0.85027004, 0.25735289, 0.06735198]])
 
 The result of the transform:
 .. codeblock::
-   > s1.transform.transform(s1.data['src'])[0:4]                                                                                 array([[0.80430773, 0.38744583, 0.2744871 ],
+   > s1.transform.transform(s1.data['src'])[0:4]
+   array([[0.80430773, 0.38744583, 0.2744871 ],
           [0.86856248, 0.14021783, 0.15375644],
           [0.89270374, 0.18248724, 0.358625  ],
           [0.85024923, 0.25737231, 0.06724511]])
