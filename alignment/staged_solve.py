@@ -1,5 +1,6 @@
 import argschema
 import alignment.solve_3d as s3
+from alignment.data_handler import DataLoader, invert_y
 from alignment.transform import StagedTransform
 import copy
 import numpy as np
@@ -56,6 +57,8 @@ class StagedSolve(argschema.ArgSchemaParser):
         # let's convince ourselves it works
         total_tfsrc = self.transform.transform(self.solves[0].data['src'])
         self.residuals = self.solves[-1].data['dst'] - total_tfsrc
+        self.residuals_mag = np.linalg.norm(self.residuals, axis=1)
+
         # for 2p -> em this atol means the residuals are within 100nm
         # on any given axis, which is pretty good...
         diff = np.linalg.norm(
@@ -85,6 +88,28 @@ class StagedSolve(argschema.ArgSchemaParser):
                         self.solves[0].left_out['src'])).squeeze().tolist()
             self.leave_out_rmag = np.linalg.norm(self.leave_out_res)
             self.leave_out_label = self.solves[0].left_out['labels'][0]
+
+
+    def sorted_labeled_residuals(self):
+        ind = np.argsort(self.residuals_mag)[::-1]
+        rlist = []
+        for i in ind:
+            rlist.append((
+                self.solves[0].data['labels'][i],
+                self.residuals_mag[i]))
+        return rlist
+
+    
+    def predict_all_data(self):
+        alldata = DataLoader(
+                input_data=copy.deepcopy(self.args['data']),
+                args=['--all_flags', 'True'])
+        alldata.run()
+        inds = alldata.data['flag'] == False
+        alldata.data['dst'][inds] = self.transform.transform(
+                alldata.data['src'][inds])
+
+        return alldata
 
 
 if __name__ == '__main__':
