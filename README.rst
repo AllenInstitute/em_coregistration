@@ -46,7 +46,7 @@ Some of the data for this example:
           [0.85027004, 0.25735289, 0.06735198]])
 
 The result of the transform:
-.. codeblock::
+::
    > s1.transform.transform(s1.data['src'])[0:4]
    array([[0.80430773, 0.38744583, 0.2744871 ],
           [0.86856248, 0.14021783, 0.15375644],
@@ -56,12 +56,12 @@ The result of the transform:
 One can get the residuals by comparing the last 2 outputs.
 
 The transform has also just been written to disk:
-.. codeblock::
+::
    > s1.args['output_json']
    '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/tmp_out/transform.json'
 
 You can use this later without re-doing the solve (though the solve is very fast):
-.. codeblock::
+::
    > from coregister.transform import Transform
    > import json
    > t = Transform(model='TPS')
@@ -74,13 +74,13 @@ You can use this later without re-doing the solve (though the solve is very fast
           [0.85024923, 0.25737231, 0.06724511]])
 
 Going the other way (optical to EM):
-.. codeblock::
+::
    > s2 = s3.Solve3D(input_data=s3.example2, args=[])
    > s2.run()
    average residual [dst units]: 1608.6795
 
 The residuals are better in this direction... not exactly sure why. It could be where the control points get set up. Same deal, you can read this transform from disk:
-.. codeblock::
+::
    > t = Transform(model='TPS')
    > with open(s2.args['output_json'], 'r') as f: 
        t.from_dict(json.load(f))
@@ -97,7 +97,7 @@ The residuals are better in this direction... not exactly sure why. It could be 
 Looks pretty good...
 
 The neuroglancer voxels are anisotropic, but the Fiji coordinates are isotropic. It is easier to just solve and transform in isotropic coordinates. From the transform results, it is an additional step to go to voxels:
-.. codeblock::
+::
    > from coregister.transform import em_nm_to_voxels
    > em_nm_to_voxels(s2.data['dst'])[0:4]
    array([[290095, 176880,  14977],
@@ -106,7 +106,7 @@ The neuroglancer voxels are anisotropic, but the Fiji coordinates are isotropic.
           [318735, 124452,  15965]])
 
 you can go backwards also:
-.. codeblock::
+::
    > em_nm_to_voxels(em_nm_to_voxels(s2.data['dst']), inverse=True)[0:4]
    array([[1172668.,  717760.,  282120.],
           [1391712.,  593752.,  337560.],
@@ -114,7 +114,7 @@ you can go backwards also:
           [1287228.,  508048.,  321640.]])
 
 There is a not-so-smooth way to make a neuroglancer link:
-.. codeblock::
+::
    > from links.make_ndviz_links import nglink1, example
    > vox = em_nm_to_voxels(s2.data['dst'])[0:4]
    > vox
@@ -124,16 +124,3 @@ There is a not-so-smooth way to make a neuroglancer link:
           [318735, 124452,  15965]])
    > print(nglink1(example['template_url'], vox[0]))
    https://neuromancer-seung-import.appspot.com/#!{"layers":[{"tab":"annotations","selectedAnnotation":"data-bounds","source":"precomputed://gs://microns-seunglab/minnie_v4/alignment/fine/sergiy_multimodel_v1/vector_fixer30_faster_v01/image_stitch_multi_block_v1","type":"image","name":"Minnie65"}],"navigation":{"pose":{"position":{"voxelSize":[4,4,40],"voxelCoordinates":[290095, 176880, 14977]}},"zoomFactor":100.0},"jsonStateServer":"https://www.dynamicannotationframework.com/nglstate/post","layout":"4panel"}
-
-support
-#######
-
-We are not currently supporting this code, but simply releasing it to the community AS IS but are not able to provide any guarantees of support, as it is under active development. The community is welcome to submit issues, but you should not expect an active response.
-
-Acknowledgement of Government Sponsorship
-#########################################
-
-Supported by the Intelligence Advanced Research Projects Activity (IARPA) via Department of Interior / Interior Business Center (DoI/IBC) contract number D16PC00004. The U.S. Government is authorized to reproduce and distribute reprints for Governmental purposes notwithstanding any copyright annotation thereon. Disclaimer: The views and conclusions contained herein are those of the authors and should not be interpreted as necessarily representing the official policies or endorsements, either expressed or implied, of IARPA, DoI/IBC, or the U.S. Government.
-
-
-
