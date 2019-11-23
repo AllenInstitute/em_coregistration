@@ -23,8 +23,7 @@ User Guide
 ##########
 
 using Ipython from the root dir of this repo:
-
-.. codeblock:: python
+::
    > import coregister.solve_3d as s3
    > s1 = s3.Solve3D(input_data=s3.example1, args=[])
    > s1.run()
@@ -33,7 +32,7 @@ using Ipython from the root dir of this repo:
 this just solved for example1 in alignment/solve_3d. The source (moving) = EM, the destination (fixed) is optical. The average residual is 2.3um.
 
 Some of the data for this example:
-.. codeblock::
+::
    > s1.data['src'][0:4]
    array([[1172669.371 ,  717762.7498,  282148.7913],
           [1391713.009 ,  593754.4669,  337574.0701],
