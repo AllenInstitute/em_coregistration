@@ -63,37 +63,37 @@ Running this can be time-consuming:
 
 For testing, one can change the leave-out fraction inside the file to something smaller than 1 (for example 0.002 will jsut run a few). I tend to run it on a cluster node. See coreg.pbs.
 
-..The neuroglancer voxels are anisotropic, but the Fiji coordinates are isotropic. It is easier to just solve and transform in isotropic coordinates. From the transform results, it is an additional step to go to voxels:
-  ::
-     from coregister.transform import em_nm_to_voxels
-  
-     em_nm_to_voxels(s2.data['dst'])[0:4]
-  
-     array([[290095, 176880,  14977],
-            [344856, 145878,  16363],
-            [342623, 187225,  17086],
-            [318735, 124452,  15965]])
-  
-  you can go backwards also:
-  ::
-     em_nm_to_voxels(em_nm_to_voxels(s2.data['dst']), inverse=True)[0:4]
-  
-     array([[1172668.,  717760.,  282120.],
-            [1391712.,  593752.,  337560.],
-            [1382780.,  759140.,  366480.],
-            [1287228.,  508048.,  321640.]])
-  
-  There is a not-so-smooth way to make a neuroglancer link:
-  ::
-     from links.make_ndviz_links import nglink1, example
-     vox = em_nm_to_voxels(s2.data['dst'])[0:4]
-     vox
-  
-     array([[290095, 176880,  14977],
-            [344856, 145878,  16363],
-            [342623, 187225,  17086],
-            [318735, 124452,  15965]])
-  
-     print(nglink1(example['template_url'], vox[0]))
-  
-     https://neuromancer-seung-import.appspot.com/#!{"layers":[{"tab":"annotations","selectedAnnotation":"data-bounds","source":"precomputed://gs://microns-seunglab/minnie_v4/alignment/fine/sergiy_multimodel_v1/vector_fixer30_faster_v01/image_stitch_multi_block_v1","type":"image","name":"Minnie65"}],"navigation":{"pose":{"position":{"voxelSize":[4,4,40],"voxelCoordinates":[290095, 176880, 14977]}},"zoomFactor":100.0},"jsonStateServer":"https://www.dynamicannotationframework.com/nglstate/post","layout":"4panel"}
+.. The neuroglancer voxels are anisotropic, but the Fiji coordinates are isotropic. It is easier to just solve and transform in isotropic coordinates. From the transform results, it is an additional step to go to voxels:
+   ::
+      from coregister.transform import em_nm_to_voxels
+   
+      em_nm_to_voxels(s2.data['dst'])[0:4]
+   
+      array([[290095, 176880,  14977],
+             [344856, 145878,  16363],
+             [342623, 187225,  17086],
+             [318735, 124452,  15965]])
+   
+   you can go backwards also:
+   ::
+      em_nm_to_voxels(em_nm_to_voxels(s2.data['dst']), inverse=True)[0:4]
+   
+      array([[1172668.,  717760.,  282120.],
+             [1391712.,  593752.,  337560.],
+             [1382780.,  759140.,  366480.],
+             [1287228.,  508048.,  321640.]])
+   
+   There is a not-so-smooth way to make a neuroglancer link:
+   ::
+      from links.make_ndviz_links import nglink1, example
+      vox = em_nm_to_voxels(s2.data['dst'])[0:4]
+      vox
+   
+      array([[290095, 176880,  14977],
+             [344856, 145878,  16363],
+             [342623, 187225,  17086],
+             [318735, 124452,  15965]])
+   
+      print(nglink1(example['template_url'], vox[0]))
+   
+      https://neuromancer-seung-import.appspot.com/#!{"layers":[{"tab":"annotations","selectedAnnotation":"data-bounds","source":"precomputed://gs://microns-seunglab/minnie_v4/alignment/fine/sergiy_multimodel_v1/vector_fixer30_faster_v01/image_stitch_multi_block_v1","type":"image","name":"Minnie65"}],"navigation":{"pose":{"position":{"voxelSize":[4,4,40],"voxelCoordinates":[290095, 176880, 14977]}},"zoomFactor":100.0},"jsonStateServer":"https://www.dynamicannotationframework.com/nglstate/post","layout":"4panel"}
