@@ -22,7 +22,7 @@ Supported by the Intelligence Advanced Research Projects Activity (IARPA) via De
 User Guide
 ##########
 
-from the root dir of this repo (or anywhere if installed):
+from the root dir of this repo. If running as an installed package, you'll need to copy this data directory somewhere with r/w permissions.
 ::
    python fit_and_predict.py
 
