@@ -1,12 +1,12 @@
-from alignment.staged_solve import StagedSolve
-from alignment.data_handler import DataLoader
+from coregister.staged_solve import StagedSolve
+from coregister.data_handler import DataLoader
 import multiprocessing
 import numpy as np
 import copy
 import os
 import json
 
-leave_out_frac = 1.0
+leave_out_frac = 0.001
 
 with open("./data/staged_transform_args.json", "r") as f:
     args = json.load(f)

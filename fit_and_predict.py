@@ -1,5 +1,5 @@
-from alignment.staged_solve import StagedSolve
-from alignment.data_handler import invert_y
+from coregister.staged_solve import StagedSolve
+from coregister.data_handler import invert_y
 import copy
 import os
 import json

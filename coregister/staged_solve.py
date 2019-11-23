@@ -1,7 +1,7 @@
 import argschema
-import alignment.solve_3d as s3
-from alignment.data_handler import DataLoader, invert_y
-from alignment.transform import StagedTransform
+from .solve_3d import Solve3D, write_src_dst_to_file
+from .data_handler import DataLoader, invert_y
+from .transform import StagedTransform
 import copy
 import numpy as np
 import os
@@ -34,14 +34,14 @@ class StagedSolve(argschema.ArgSchemaParser):
                     "staged_transform_%d.json" % i)
             step_args['transform'] = transform
             self.solves.append(
-                    s3.Solve3D(
+                    Solve3D(
                         input_data=copy.deepcopy(step_args),
                         args=[]))
             self.solves[-1].run()
 
             # write the transformed result to file
             # for input to the next stage
-            s3.write_src_dst_to_file(
+            write_src_dst_to_file(
                     tmpfile.name,
                     self.solves[-1].transform.transform(
                         self.solves[-1].data['src']),
