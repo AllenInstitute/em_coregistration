@@ -6,7 +6,7 @@ import copy
 import os
 import json
 
-leave_out_frac = 0.001
+leave_out_frac = 1.0
 
 with open("./data/staged_transform_args.json", "r") as f:
     args = json.load(f)
