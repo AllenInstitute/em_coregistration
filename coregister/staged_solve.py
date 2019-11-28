@@ -76,7 +76,7 @@ class StagedSolve(argschema.ArgSchemaParser):
                 cdst = s.transform.transform(csrc)
                 delta = cdst - csrc
                 self.avdelta = np.linalg.norm(delta, axis=1).mean() * 0.001
-                print('transform %d control points moved average of %0.1fum' %
+                print('transform %d control points moved average of %0.6fum' %
                       (si, self.avdelta))
 
         self.leave_out_res = None

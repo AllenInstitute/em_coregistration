@@ -4,10 +4,11 @@ import copy
 import os
 import json
 
+args_path = "./data/staged_transform_args.json"
+# args_path = "./data/inverse_staged_transform_args.json"
 
-with open("./data/staged_transform_args.json", "r") as f:
+with open(args_path, "r") as f:
     args = json.load(f)
-
 
 s = StagedSolve(input_data=copy.deepcopy(args), args=[])
 s.run()
@@ -15,7 +16,7 @@ s.run()
 rlist = s.sorted_labeled_residuals()
 print('worst points')
 for r in rlist[0:10]:
-    print("%10s %10.1f" % (r[0], r[1]))
+    print("%10s %10.6f" % (r[0], r[1]))
 
 alldata = s.predict_all_data()
 # re-invert y for output back to annotators
