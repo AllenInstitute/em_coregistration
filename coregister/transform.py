@@ -24,10 +24,10 @@ def em_nm_to_voxels(xyz, inverse=False):
         vxyz[:, 1] = (xyz[:, 1] + 2560) * 4.0
         vxyz[:, 2] = (xyz[:, 2] - 7924) * 40.0
     else:
-        vxyz = np.zeros_like(xyz).astype(int)
-        vxyz[:, 0] = ((xyz[:, 0] / 4) - 3072).astype('int')
-        vxyz[:, 1] = ((xyz[:, 1] / 4) - 2560).astype('int')
-        vxyz[:, 2] = ((xyz[:, 2]/40.0) + 7924).astype('int')
+        vxyz = np.zeros_like(xyz).astype(float)
+        vxyz[:, 0] = ((xyz[:, 0] / 4) - 3072)
+        vxyz[:, 1] = ((xyz[:, 1] / 4) - 2560)
+        vxyz[:, 2] = ((xyz[:, 2]/40.0) + 7924)
     return vxyz
 
 

@@ -1,0 +1,26 @@
+language: python
+dist: xenial
+python:
+- '3.6'
+- '3.7'
+install:
+- pip install codecov
+- pip install -r requirements.txt
+- pip install -r test_requirements.txt
+script:
+- python setup.py test
+cache:
+- pip
+after_success:
+- codecov -t 27ef6fc2-7ebc-4ff5-94c9-58c0c10f26c0
+jobs:
+  include:
+    if: branch = develop
+    stage: push
+    install: skip
+    script: skip
+    after_success:
+    - codecov -t 27ef6fc2-7ebc-4ff5-94c9-58c0c10f26c0
+    - chmod +x .travis/merge_script.sh
+    - BRANCHES_TO_MERGE_REGEX='develop' BRANCH_TO_MERGE_INTO=master GITHUB_REPO=AllenInstitute/em_coregistration
+      .travis/merge_script.sh

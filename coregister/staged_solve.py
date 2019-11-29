@@ -73,11 +73,10 @@ class StagedSolve(argschema.ArgSchemaParser):
         for si, s in enumerate(self.solves):
             if s.transform.control_pts is not None:
                 csrc = s.transform.control_pts
-                print('control pts shape: ', csrc.shape)
                 cdst = s.transform.transform(csrc)
                 delta = cdst - csrc
                 self.avdelta = np.linalg.norm(delta, axis=1).mean() * 0.001
-                print('transform %d control points moved average of %0.1fum' %
+                print('transform %d control points moved average of %0.6fum' %
                       (si, self.avdelta))
 
         self.leave_out_res = None
