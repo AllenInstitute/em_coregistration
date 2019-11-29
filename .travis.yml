@@ -1,0 +1,35 @@
+language: python
+dist: xenial
+python:
+- "3.6"
+- "3.7"
+addons:
+  apt:
+    packages:
+    - wget
+install:
+- pip install codecov
+- pip install -r requirements.txt
+- pip install -r test_requirements.txt
+env:
+  - secure: Ui2hz09gJZNviW+qbTAHyTVlx8gd5kGGsYXrfpRmHdCR49zp+Tkv1LYwKrqLWGjQA3AMjAgdIGJgDpA+LT1w1KU3dL4J9JEXuBsVvhu4RkMvO+Oy2KhVrxGEeokNyyN5c4i8j8dHkEzwLEq/g2OYoHhqRpmuLl4et9D8X6vowy3+1hDf/ku/FXHHdcUti9WvyuqDQ+9Y3rcTgWFqC4CAQwXJHSSzfAduc3LYC9BsEAdRyxG8VmgnkIspmuQBVRBFLElVZX9UlLmR71fgOzTtVML06UKv2cm1JU0ylA6WC8pbJVOPDZ3OQLDOBOC99nEz8HUD2E7x4ixxlHx0AE1Qs/Dsb2d+JGwPoSi6JNobQGNIhmkrPf957g6MsMHgH23dNWUSpAkDx6OzCNPEqobP4T3JigWnHOLFwWxav49dsGWneLB9QHE1Landr1rlUegXiuXWm7T3z5hSjIfT6Bun7lQmd/7Qms8osKJz8LJJIvsV8tq5qWe21G8MCCIK/ypje0JJwBo7LiqFmpCbviIXcqngGvzHsww8yNFu4Wx7NYfoAcdCorbJmggk1caoX2SIs5HxLRgxfSQxGW+Ty1JhlliWT2kxfsM7tGfw/AcS9idFTCY160M3Y8tbdE2q9AITiqAB5vsBTy1pLM8MFlm2NrfoOYX1NhaUpaVdZh8qNH8=
+script:
+- python setup.py test
+cache:
+  pip: true
+  directories:
+  - "$HOME/.m2"
+cache:
+- pip
+after_success:
+- codecov -t 27ef6fc2-7ebc-4ff5-94c9-58c0c10f26c0
+jobs:
+  include:
+    if: branch = develop
+    stage: push
+    install: skip
+    script: skip
+    after_success: 
+    - codecov -t 27ef6fc2-7ebc-4ff5-94c9-58c0c10f26c0
+    - chmod +x .travis/merge_script.sh
+    - BRANCHES_TO_MERGE_REGEX='develop' BRANCH_TO_MERGE_INTO=master GITHUB_REPO=AllenInstitute/em_coregistration .travis/merge_script.sh
