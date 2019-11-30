@@ -1,6 +1,6 @@
 import argschema
 from .schemas import SolverSchema
-from .data_handler import DataLoader
+from .data_loader import DataLoader
 from .transform.transform import Transform
 import numpy as np
 import scipy
