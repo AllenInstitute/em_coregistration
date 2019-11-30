@@ -28,3 +28,19 @@ def em_nm_to_voxels(xyz, inverse=False):
         vxyz[:, 2] = ((xyz[:, 2]/40.0) + 7924)
     return vxyz
 
+
+def write_src_dst_to_file(fpath, src, dst):
+    """csv output of src and dst
+
+    Parameters
+    ----------
+    fpath : str
+        valid path
+    src : :class:`numpy.ndarray`
+        ndata x 3 source points
+    dst : :class:`numpy.ndarray`
+        ndata x 3 destination points
+
+    """
+    out = np.hstack((src, dst))
+    np.savetxt(fpath, out, fmt='%0.8e', delimiter=',')
