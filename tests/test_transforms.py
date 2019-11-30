@@ -1,4 +1,4 @@
-from coregister.transform.transform import Transform
+from coregister.transform import Transform, PolynomialModel
 import numpy as np
 import pytest
 
@@ -31,38 +31,23 @@ def test_polynomial_solution(order):
     assert np.all(rmag < 5)
 
 
+@pytest.mark.parametrize('order', [1, 2, 3])
+def test_to_from_dict(order):
+    t = Transform('PolynomialModel', order=order)
+    t.parameters += np.random.randn(*t.parameters.shape) * 0.1
+    jt = t.to_dict()
+
+    t2 = Transform(json=jt)
+
+    assert t2.order == t.order
+    assert np.allclose(t2.parameters, t.parameters)
+
+    tp = PolynomialModel(json=jt)
+    assert tp.order == t.order
+    assert np.allclose(tp.parameters, t.parameters)
+
+
 @pytest.mark.parametrize('order', [0, 4])
 def test_polynomial_order(order):
     with pytest.raises(ValueError):
         t = Transform(name="PolynomialModel", order=order)
-
-
-
-    ## translations
-    #trans = np.random.randn(3) * 100
-    #t.parameters[0, 0:3] = trans
-    #dst = t.tform(src)
-    #assert np.allclose((src + trans), dst)
-    #isrc = t.inverse_tform(dst)
-    #assert np.allclose(isrc, src)
-
-    ## non-translations
-    #t = Transform(name="AffineModel")
-    #t.parameters[1:4, :] = np.eye(3) + np.random.randn(3, 3) * 0.1
-    #dst = t.tform(src)
-    #isrc = t.inverse_tform(dst)
-
-    ## everything
-    #t = Transform(name="AffineModel")
-    #t.parameters[1:4, :] = np.eye(3) + np.random.randn(3, 3) * 0.1
-    #t.parameters[0, 0:3] = np.random.randn(3) * 1000
-    #dst = t.tform(src)
-    #isrc = t.inverse_tform(dst)
-    #assert np.allclose(isrc, src)
-
-    ## json
-    #j = t.to_dict()
-    #t2 = Transform(json=j)
-    #dst = t2.tform(src)
-    #isrc = t2.inverse_tform(dst)
-    #assert np.allclose(isrc, src)
