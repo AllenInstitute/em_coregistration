@@ -1,7 +1,7 @@
 import argschema
 from .schemas import SolverSchema
 from .data_handler import DataLoader
-from .transform import Transform
+from .transform.transform import Transform
 import numpy as np
 import scipy
 
@@ -14,15 +14,10 @@ example1 = {
             'sd_set': {'src': 'em', 'dst': 'opt'}
         },
         "transform": {
-            'model': 'TPS',
-            'npts': 10,
-            'regularization': {
-                'translation': 1e-15,
-                'linear': 1e-15,
-                'other': 1e-15,
-                }
+            'name': 'PolynomialModel',
+            'order': 1
+            }
         }
-}
 
 example2 = {
         'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/transform.json',
@@ -33,15 +28,10 @@ example2 = {
             'sd_set': {'src': 'opt', 'dst': 'em'}
         },
         "transform": {
-            'model': 'TPS',
-            'npts': 10,
-            'regularization': {
-                'translation': 1e-10,
-                'linear': 1e-10,
-                'other': 1e10,
+            'name': 'PolynomialModel',
+            'order': 1,
                 }
         }
-}
 
 
 def control_pts_from_bounds(data, npts, bounds_buffer=0):
@@ -219,44 +209,13 @@ class Solve3D(argschema.ArgSchemaParser):
 
         self.data, self.left_out = leave_out(self.data, self.args['leave_out_index'])
 
-        if control_pts is None:
-            if self.args['transform']['npts']:
-                if np.all(np.array(self.args['transform']['npts']) == -1):
-                    control_pts = np.copy(self.data['src'])
-                else:
-                    control_pts = control_pts_from_bounds(
-                            self.data['src'],
-                            self.args['transform']['npts'],
-                            bounds_buffer=self.args['transform']['bounds_buffer'])
+        self.transform = Transform(json=self.args['transform'])
 
-        nz = None
-        if 'nz' in self.args['transform'].keys():
-            nz = self.args['transform']['nz']
-
-        self.transform = Transform(
-                self.args['transform']['model'], nz=nz, control_pts=control_pts, axis=self.args['transform']['axis'])
-
-        # unit weighting per point
-        self.wts = np.eye(self.data['src'].shape[0])
-
-        self.A = self.transform.kernel(self.data['src'])
-
-        self.reg = create_regularization(
-                self.A.shape[1], self.args['transform']['regularization'])
-
-        # solve the system of equations
-        self.x = solve(
-                self.A,
-                self.wts,
-                self.reg,
-                self.data['dst'])
-
-        # set the parameters for the transform
-        self.transform.load_parameters(self.x)
+        self.transform.estimate(self.data['src'], self.data['dst'])
 
         self.residuals = (
                 self.data['dst'] -
-                self.transform.transform(self.data['src']))
+                self.transform.tform(self.data['src']))
 
         print('average residual [dst units]: %0.4f' % (
             np.linalg.norm(self.residuals, axis=1).mean()))

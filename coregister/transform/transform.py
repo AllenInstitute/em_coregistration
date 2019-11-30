@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.spatial
-from . affine import AffineModel
+from . polynomial import PolynomialModel
 
 #def linear_kernel(src, control_pts=None):
 #    """linear, i.e. affine, kernel
@@ -111,7 +111,7 @@ class Transform():
        and desrialization functions.
     """
 
-    def __init__(self, name=None, json=None):
+    def __init__(self, name=None, json=None, **kwargs):
         """Initialize Transform
         Parameters
         ----------
@@ -122,16 +122,16 @@ class Transform():
             (supersedes className, dataString, and transformId if not None)
         """
         classes = {
-                "AffineModel": AffineModel
+                "PolynomialModel": PolynomialModel
                 }
 
         if json is not None:
             self.__class__ = classes[json['name']]
+            self.__class__.__init__(self, **{k: v for k, v in json.items() if k != 'name'}, **kwargs)
 
         elif name is not None:
             self.__class__ = classes[name]
-
-        self.__class__.__init__(self, json=json)
+            self.__class__.__init__(self, **kwargs)
 
 
     #def kernel(self, src, zr=None, tri=None):
@@ -232,5 +232,5 @@ class Transform():
 #    def transform(self, coords):
 #        x = np.copy(coords)
 #        for tf in self.tflist:
-#            x = tf.transform(x)
+#            x = tf.tform(x)
 #        return x

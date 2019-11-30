@@ -81,46 +81,52 @@ class regularization(ArgSchema):
                 data['tps'] = [data['tps']] * 3
 
 
-class TransformSchema(DefaultSchema):
-    regularization = Nested(regularization)
-    bounds_buffer = Float(
-        required=False,
-        missing=0.0,
-        default=0.0,
-        description="extend boundaries by this much for computing control points")
-    model = Str(
-        required=False,
-        default='TPS',
-        missing='TPS',
-        description=("LIN, POLY, or TPS for linear, polynomial, "
-                     "thin plate spline"))
-    npts = List(
-        Int,
-        required=False,
-        missing=None,
-        default=None,
-        description="number of pts per axis for TPS controls")
-    nz = Int(
-        required=False,
-        missing=21,
-        deault=21,
-        description="number of z slabs for chunked z")
-    axis = Str(
-        required=False,
-        missing='z',
-        default='z',
-        description='axis for chunked affine')
-
-    @mm.pre_load
-    def tolist(self, data):
-        if 'npts' in data:
-            if not isinstance(data['npts'], list):
-                data['npts'] = [data['npts']] * 3
+#class TransformSchema(DefaultSchema):
+#    regularization = Nested(regularization)
+#    name = Str(
+#        required=True,
+#        validate=mm.validate.OneOf("AffineModel"),
+#        description="name of transform model")
+#    bounds_buffer = Float(
+#        required=False,
+#        missing=0.0,
+#        default=0.0,
+#        description="extend boundaries by this much for computing control points")
+#    model = Str(
+#        required=False,
+#        default='TPS',
+#        missing='TPS',
+#        description=("LIN, POLY, or TPS for linear, polynomial, "
+#                     "thin plate spline"))
+#    npts = List(
+#        Int,
+#        required=False,
+#        missing=None,
+#        default=None,
+#        description="number of pts per axis for TPS controls")
+#    nz = Int(
+#        required=False,
+#        missing=21,
+#        deault=21,
+#        description="number of z slabs for chunked z")
+#    axis = Str(
+#        required=False,
+#        missing='z',
+#        default='z',
+#        description='axis for chunked affine')
+#
+#    @mm.pre_load
+#    def tolist(self, data):
+#        if 'npts' in data:
+#            if not isinstance(data['npts'], list):
+#                data['npts'] = [data['npts']] * 3
 
 
 class SolverSchema(ArgSchema):
     data = Nested(DataLoaderSchema)
-    transform = Nested(TransformSchema)
+    transform = Dict(
+        required=True,
+        description="dict containing transform specification")
     leave_out_index = Int(
         required=False,
         missing=None,
