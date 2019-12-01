@@ -1,6 +1,5 @@
 from coregister.solve_3d import Solve3D
 import numpy as np
-import pytest
 
 example1 = {
         'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/transform.json',

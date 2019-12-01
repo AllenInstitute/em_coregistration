@@ -4,22 +4,24 @@ from . utils import solve
 
 
 class PolynomialModel():
-    def __init__(self, json=None, parameters=None, regularization=0, order=1):
-        ndict = {
+    def __init__(
+            self, json=None, parameters=None, regularization=None, order=1):
+        self.ndict = {
                 1: 4,
                 2: 10,
                 3: 20
                 }
+
+        if json is not None:
+            self.from_dict(json)
+            return
+
         self.order = order
-        if order not in ndict:
+        if order not in self.ndict:
             raise ValueError(
                     "order = {} not currently supported".format(order))
 
-        if type(regularization) in [list, np.ndarray]:
-            self.regularization = np.array(regularization)
-        else:
-            self.regularization = np.array(
-                    [regularization] * ndict[self.order])
+        self.set_regularization(regularization)
 
         if parameters is None:
             self.parameters = np.array([
@@ -34,20 +36,28 @@ class PolynomialModel():
             if self.order > 1:
                 self.parameters = np.vstack((
                     self.parameters,
-                    np.zeros((ndict[self.order] - 4, 3))))
+                    np.zeros((self.ndict[self.order] - 4, 3))))
 
         else:
             self.parameters = np.array(parameters)
 
-        if json is not None:
-            self.from_dict(json)
+    def set_regularization(self, regularization=None):
+        if regularization is None:
+            regularization = 0.0
+        if type(regularization) in [list, np.ndarray]:
+            self.regularization = np.array(regularization)
+        else:
+            self.regularization = np.array(
+                    [regularization] * self.ndict[self.order])
 
     def from_dict(self, json):
         self.order = json['order']
         if 'parameters' in json:
             self.parameters = np.array(json['parameters'])
+        regularization = None
         if 'regularization' in json:
-            self.regularization = np.array(json['regularization'])
+            regularization = json['regularization']
+        self.set_regularization(regularization=regularization)
 
     def to_dict(self):
         return {

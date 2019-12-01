@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.spatial
 from . polynomial import PolynomialModel
+from . chunked import ChunkedModel
 
 #def linear_kernel(src, control_pts=None):
 #    """linear, i.e. affine, kernel
@@ -122,12 +123,13 @@ class Transform():
             (supersedes className, dataString, and transformId if not None)
         """
         classes = {
-                "PolynomialModel": PolynomialModel
+                "PolynomialModel": PolynomialModel,
+                "ChunkedModel": ChunkedModel
                 }
 
         if json is not None:
             self.__class__ = classes[json['name']]
-            self.__class__.__init__(self, **{k: v for k, v in json.items() if k != 'name'}, **kwargs)
+            self.__class__.__init__(self, json=json)
 
         elif name is not None:
             self.__class__ = classes[name]
