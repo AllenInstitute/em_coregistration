@@ -141,3 +141,49 @@ def test_chunked_values():
     tsrc = td.tform(src)
     res = np.linalg.norm(tsrc - dst, axis=1)
     assert res.mean() < np.linalg.norm(dst, axis=1).mean() * 0.001
+
+
+def test_spline_identity():
+    t = Transform(name="SplineModel")
+    src = np.random.randn(100, 3)
+    t.set_control_pts_from_src(src)
+    assert np.allclose(t.tform(src), src)
+
+
+def test_spline_solution():
+    t = Transform(name="SplineModel")
+    src = np.random.randn(100, 3)
+    t.estimate(src, src)
+    assert np.allclose(t.tform(src), src)
+
+
+def test_spline_complicated_solution():
+    tp = Transform(name="PolynomialModel", order=2)
+    tp.parameters[0, :] = np.random.randn(3)
+    tp.parameters[1:4, :] += np.random.randn(3, 3) * 0.02
+    tp.parameters[4:10, :] += np.random.randn(6, 3) * 0.0002
+
+    src = np.random.randn(10000, 3)
+    noise = np.random.randn(*src.shape) * 0.001
+    dst = tp.tform(src) + noise
+
+    ts = Transform(name="SplineModel", ncntrl=[10, 10, 10])
+    ts.estimate(src, dst)
+    res = ts.tform(src) - dst
+    rmag = np.linalg.norm(res, axis=1)
+    assert rmag.mean() < np.linalg.norm(noise, axis=1).mean() * 10
+
+    # to from dict
+    td = Transform(json=ts.to_dict())
+    res = td.tform(src) - dst
+    rmag = np.linalg.norm(res, axis=1)
+    assert rmag.mean() < np.linalg.norm(noise, axis=1).mean() * 10
+
+    # set via init
+    tinit = Transform(
+            name="SplineModel",
+            parameters=td.parameters.tolist(),
+            control_pts=td.control_pts.tolist())
+    res = tinit.tform(src) - dst
+    rmag = np.linalg.norm(res, axis=1)
+    assert rmag.mean() < np.linalg.norm(noise, axis=1).mean() * 10
