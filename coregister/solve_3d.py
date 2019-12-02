@@ -3,7 +3,7 @@ from .schemas import SolverSchema
 from .data_loader import DataLoader
 from .transform.transform import Transform
 import numpy as np
-import scipy
+
 
 example1 = {
         'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/transform.json',
@@ -32,39 +32,6 @@ example2 = {
             'order': 1,
                 }
         }
-
-
-def control_pts_from_bounds(data, npts, bounds_buffer=0):
-    """create thin plate spline control points
-    from the bounds of provided data.
-
-    Parameters
-    ----------
-    data : :class:`numpy.ndarray`
-        ndata x 3 Cartesian coordinates of data.
-    npts : list
-        [nx, ny, nz]
-        number of control points per axis. total
-        number of control points will be nx * ny * nz
-
-    Returns
-    -------
-    control_pts : :class:`numpy.ndarray`
-        npts^3 x 3 Cartesian coordinates of controls.
-
-    """
-    x, y, z = [
-            np.linspace(
-                data[:, i].min() - bounds_buffer,
-                data[:, i].max() + bounds_buffer,
-                npts[i])
-            for i in [0, 1, 2]]
-    xt, yt, zt = np.meshgrid(x, y, z)
-    control_pts = np.vstack((
-        xt.flatten(),
-        yt.flatten(),
-        zt.flatten())).transpose()
-    return control_pts
 
 
 def leave_out(data, index):
@@ -106,7 +73,8 @@ class Solve3D(argschema.ArgSchemaParser):
         d.run()
         self.data = d.data
 
-        self.data, self.left_out = leave_out(self.data, self.args['leave_out_index'])
+        self.data, self.left_out = leave_out(
+                self.data, self.args['leave_out_index'])
 
         self.transform = Transform(json=self.args['transform'])
 

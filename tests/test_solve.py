@@ -1,5 +1,7 @@
 from coregister.solve_3d import Solve3D
 import numpy as np
+import copy
+
 
 example1 = {
         'output_json': '/allen/programs/celltypes/workgroups/em-connectomics/danielk/em_coregistration/transform.json',
@@ -58,6 +60,21 @@ def test_leave_out(tmpdir):
 def test_example2(tmpdir):
     fname = str(tmpdir.mkdir("sub").join("transform.json"))
     s = Solve3D(input_data=example2, args=['--output_json', fname])
+    s.run()
+    rmag = np.linalg.norm(s.residuals, axis=1)
+    assert rmag.mean() < 16000
+
+
+def test_example2_spline(tmpdir):
+    fname = str(tmpdir.mkdir("sub").join("spline_transform.json"))
+    args = copy.deepcopy(example2)
+    args['transform'] = {
+            'name': "SplineModel",
+            "ncntrl": [4, 4, 4],
+            'regularization': 0
+            }
+    args['output_json'] = fname
+    s = Solve3D(input_data=args, args=[])
     s.run()
     rmag = np.linalg.norm(s.residuals, axis=1)
     assert rmag.mean() < 16000

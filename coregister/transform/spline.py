@@ -59,17 +59,22 @@ class SplineModel():
                     [regularization] * self.parameters.shape[0])
 
     def from_dict(self, json):
-        self.control_pts = np.array(json['control_pts'])
+        self.ncntrl = np.array(json['ncntrl'])
+        if 'control_pts' in json:
+            self.control_pts = np.array(json['control_pts'])
         if 'parameters' in json:
             self.parameters = np.array(json['parameters'])
+        else:
+            self.set_identity_parameters()
         regularization = None
         if 'regularization' in json:
             regularization = json['regularization']
-        self.set_regularization(regularization=regularization)
+            self.set_regularization(regularization=regularization)
 
     def to_dict(self):
         return {
                 'name': "SplineModel",
+                'ncntrl': self.ncntrl.tolist(),
                 'control_pts': self.control_pts.tolist(),
                 'parameters': self.parameters.tolist(),
                 'regularization': self.regularization.tolist()
