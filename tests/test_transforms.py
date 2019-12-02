@@ -163,7 +163,7 @@ def test_spline_complicated_solution():
     tp.parameters[1:4, :] += np.random.randn(3, 3) * 0.02
     tp.parameters[4:10, :] += np.random.randn(6, 3) * 0.0002
 
-    src = np.random.randn(10000, 3)
+    src = np.random.randn(3000, 3)
     noise = np.random.randn(*src.shape) * 0.001
     dst = tp.tform(src) + noise
 
@@ -187,3 +187,13 @@ def test_spline_complicated_solution():
     res = tinit.tform(src) - dst
     rmag = np.linalg.norm(res, axis=1)
     assert rmag.mean() < np.linalg.norm(noise, axis=1).mean() * 10
+
+    # exact src points
+    reg = [0, 0, 0, 0]
+    reg = np.concatenate((reg, [1e-3] * src.shape[0]))
+    ts = Transform(name="SplineModel", src_is_cntrl=True, regularization=reg)
+    ts.estimate(src, dst)
+    res = ts.tform(src) - dst
+    rmag = np.linalg.norm(res, axis=1)
+    assert rmag.mean() < 1e-3
+    

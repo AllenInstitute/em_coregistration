@@ -6,11 +6,14 @@ from . utils import solve
 class SplineModel():
     def __init__(
             self, json=None, parameters=None,
-            regularization=None, control_pts=None, ncntrl=[2, 2, 2]):
+            regularization=None, control_pts=None, ncntrl=[2, 2, 2],
+            src_is_cntrl=False):
 
         if json is not None:
             self.from_dict(json)
             return
+
+        self.src_is_cntrl = src_is_cntrl
 
         self.ncntrl = np.array(ncntrl)
         if control_pts is not None:
@@ -36,7 +39,10 @@ class SplineModel():
             self.parameters,
             np.zeros((self.ncntrl.prod(), 3))))
 
-    def set_control_pts_from_src(self, src, ncntrl=None):
+    def set_control_pts_from_src(self, src, ncntrl=None, src_is_cntrl=False):
+        if src_is_cntrl:
+            self.control_pts = np.copy(src)
+            return
         if ncntrl is not None:
             self.ncntrl = np.array(ncntrl)
         x, y, z = [
@@ -60,6 +66,9 @@ class SplineModel():
 
     def from_dict(self, json):
         self.ncntrl = np.array(json['ncntrl'])
+        self.src_is_cntrl = False
+        if 'src_is_cntrl' in json:
+            self.src_is_cntrl = json['src_is_cntrl']
         if 'control_pts' in json:
             self.control_pts = np.array(json['control_pts'])
         if 'parameters' in json:
@@ -77,7 +86,8 @@ class SplineModel():
                 'ncntrl': self.ncntrl.tolist(),
                 'control_pts': self.control_pts.tolist(),
                 'parameters': self.parameters.tolist(),
-                'regularization': self.regularization.tolist()
+                'regularization': self.regularization.tolist(),
+                'src_is_cntrl': self.src_is_cntrl
                 }
 
     def kernel(self, src):
@@ -128,7 +138,8 @@ class SplineModel():
         if wts is None:
             wts = np.eye(src.shape[0])
         if not hasattr(self, 'control_pts'):
-            self.set_control_pts_from_src(src, self.ncntrl)
+            self.set_control_pts_from_src(
+                src, self.ncntrl, src_is_cntrl=self.src_is_cntrl)
         self.parameters = solve(
                 self.kernel(src),
                 wts,
