@@ -1,5 +1,5 @@
 from coregister.transform import (
-        Transform, PolynomialModel, ChunkedModel)
+        Transform, TransformList, PolynomialModel, ChunkedModel)
 import numpy as np
 import pytest
 
@@ -189,11 +189,52 @@ def test_spline_complicated_solution():
     assert rmag.mean() < np.linalg.norm(noise, axis=1).mean() * 10
 
     # exact src points
-    reg = [0, 0, 0, 0]
-    reg = np.concatenate((reg, [1e-3] * src.shape[0]))
-    ts = Transform(name="SplineModel", src_is_cntrl=True, regularization=reg)
+    ts = Transform(name="SplineModel", src_is_cntrl=True)
     ts.estimate(src, dst)
     res = ts.tform(src) - dst
     rmag = np.linalg.norm(res, axis=1)
     assert rmag.mean() < 1e-3
-    
+
+
+def test_transform_list():
+    tp = Transform(name="PolynomialModel", order=2)
+    tp.parameters[0, :] = np.random.randn(3)
+    tp.parameters[1:4, :] += np.random.randn(3, 3) * 0.02
+    tp.parameters[4:10, :] += np.random.randn(6, 3) * 0.0002
+    src = np.random.randn(3000, 3)
+    noise = np.random.randn(*src.shape) * 0.001
+    dst = tp.tform(src) + noise
+
+    tflist_args = [
+            {
+                'name': "PolynomialModel",
+                'order': 1
+                },
+            {
+                'name': 'ChunkedModel',
+                'order': 1,
+                'axis': 2,
+                'nchunks': 4
+                },
+            {
+                'name': 'SplineModel',
+                'ncntrl': [3, 3, 3]
+                },
+            {
+                'name': 'SplineModel',
+                'src_is_cntrl': True
+                }
+            ]
+    tflist = TransformList(transforms=tflist_args)
+
+    tflist.estimate(src, dst)
+    tsrc = tflist.tform(src)
+    rmag = np.linalg.norm(dst - tsrc, axis=1)
+    assert rmag.mean() < 0.001
+
+    # to from dict
+    tflist2 = TransformList(json=tflist.to_dict())
+    tsrc2 = tflist2.tform(src)
+    rmag2 = np.linalg.norm(dst - tsrc2, axis=1)
+    assert rmag2.mean() < 0.001
+    assert np.allclose(tsrc, tsrc2)

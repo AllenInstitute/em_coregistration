@@ -42,6 +42,12 @@ class SplineModel():
     def set_control_pts_from_src(self, src, ncntrl=None, src_is_cntrl=False):
         if src_is_cntrl:
             self.control_pts = np.copy(src)
+            nc = self.control_pts.shape[0] + 4
+            nr = len(self.regularization)
+            # copy the last regularization parameter
+            self.regularization = np.concatenate((
+                self.regularization,
+                [self.regularization[-1]] * (nc - nr)))
             return
         if ncntrl is not None:
             self.ncntrl = np.array(ncntrl)
