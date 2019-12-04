@@ -238,3 +238,10 @@ def test_transform_list():
     rmag2 = np.linalg.norm(dst - tsrc2, axis=1)
     assert rmag2.mean() < 0.001
     assert np.allclose(tsrc, tsrc2)
+
+    # as Transform
+    tf = Transform(json=tflist.to_dict())
+    tsrc3 = tf.tform(src)
+    rmag3 = np.linalg.norm(dst - tsrc3, axis=1)
+    assert rmag3.mean() < 0.001
+    assert np.allclose(tsrc, tsrc3)

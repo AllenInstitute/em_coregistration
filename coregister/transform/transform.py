@@ -23,7 +23,8 @@ class Transform():
         classes = {
                 "PolynomialModel": PolynomialModel,
                 "ChunkedModel": ChunkedModel,
-                "SplineModel": SplineModel
+                "SplineModel": SplineModel,
+                "TransformList": TransformList,
                 }
 
         if json is not None:
@@ -51,11 +52,13 @@ class TransformList():
         return dst
 
     def to_dict(self):
-        j = [t.to_dict() for t in self.transforms]
+        j = {}
+        j['name'] = "TransformList"
+        j['transforms'] = [t.to_dict() for t in self.transforms]
         return j
 
     def from_dict(self, json):
-        self.transforms = [Transform(json=j) for j in json]
+        self.transforms = [Transform(json=j) for j in json['transforms']]
 
     def estimate(self, src, dst):
         nsrc = np.copy(src)
