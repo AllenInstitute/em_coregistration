@@ -1,22 +1,42 @@
-from coregister.staged_solve import StagedSolve
-from coregister.data_handler import invert_y
+from coregister.solve import Solve3D
+from coregister.data_loader import invert_y
+from coregister.transform import Transform
 import copy
 import os
 import json
+import numpy as np
 
+
+# solve with some inputs
 args_path = "./data/staged_transform_args.json"
-# args_path = "./data/inverse_staged_transform_args.json"
-
-with open(args_path, "r") as f:
-    args = json.load(f)
-
-s = StagedSolve(input_data=copy.deepcopy(args), args=[])
+output_path = "./data/staged_transform_solution.json"
+s = Solve3D(args=[
+    "--input_json", args_path,
+    "--output_json", output_path])
 s.run()
-
-rlist = s.sorted_labeled_residuals()
 print('worst points')
-for r in rlist[0:10]:
+for r in s.sorted_labeled_residuals[0:10]:
     print("%10s %10.6f" % (r[0], r[1]))
+
+# look at residuals at every step of transform
+with open(output_path, 'r') as f:
+    jout = json.load(f)
+ntransforms = len(jout['transforms'])
+for i in range(1, ntransforms + 1):
+    jtemp = copy.deepcopy(jout)
+    jtemp['transforms'] = jtemp['transforms'][0:i]
+    tf = Transform(json=jtemp)
+    residuals = tf.tform(s.data['src']) - s.data['dst']
+    rmag = np.linalg.norm(residuals, axis=1).mean()
+    lastone = tf.transforms[-1].__class__.__name__
+    infostr = "{} residual {:0.3f}".format(lastone, rmag)
+    if lastone == "SplineModel":
+        src = tf.transforms[-1].control_pts
+        dst = tf.transforms[-1].tform(src)
+        mov = np.linalg.norm(dst - src, axis=1).mean()
+        infostr += " cntrls moved {:0.3f}".format(mov)
+    print(infostr)
+
 
 alldata = s.predict_all_data()
 # re-invert y for output back to annotators

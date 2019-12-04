@@ -26,7 +26,19 @@ class ChunkedModel():
 
     def from_dict(self, json):
         self.nchunks = json['nchunks']
-        self.transforms = [PolynomialModel(json=j) for j in json['transforms']]
+        if 'regularization' in json:
+            regularization = json['regularization']
+        else:
+            regularization = 0.0
+        if 'transforms' in json:
+            self.transforms = [PolynomialModel(json=j) for j in json['transforms']]
+        else:
+            self.transforms = []
+            for i in range(self.nchunks):
+                self.transforms.append(
+                        PolynomialModel(
+                            regularization=regularization,
+                            order=json['order']))
         self.axis = json['axis']
         if 'ranges' in json:
             self.ranges = np.array(json['ranges'])

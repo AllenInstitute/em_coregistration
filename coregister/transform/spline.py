@@ -39,16 +39,20 @@ class SplineModel():
             self.parameters,
             np.zeros((self.ncntrl.prod(), 3))))
 
+    def extend_regularization(self):
+        nc = self.control_pts.shape[0] + 4
+        nr = len(self.regularization)
+        # copy the last regularization parameter
+        self.regularization = np.concatenate((
+            self.regularization,
+            [self.regularization[-1]] * (nc - nr)))
+
     def set_control_pts_from_src(self, src, ncntrl=None, src_is_cntrl=False):
         if src_is_cntrl:
             self.control_pts = np.copy(src)
-            nc = self.control_pts.shape[0] + 4
-            nr = len(self.regularization)
-            # copy the last regularization parameter
-            self.regularization = np.concatenate((
-                self.regularization,
-                [self.regularization[-1]] * (nc - nr)))
+            self.extend_regularization()
             return
+
         if ncntrl is not None:
             self.ncntrl = np.array(ncntrl)
         x, y, z = [
@@ -60,6 +64,7 @@ class SplineModel():
             xt.flatten(),
             yt.flatten(),
             zt.flatten())).transpose()
+        self.extend_regularization()
 
     def set_regularization(self, regularization=None):
         if regularization is None:
@@ -71,7 +76,9 @@ class SplineModel():
                     [regularization] * self.parameters.shape[0])
 
     def from_dict(self, json):
-        self.ncntrl = np.array(json['ncntrl'])
+        self.ncntrl = np.array([2, 2, 2])
+        if 'ncntrl' in json:
+            self.ncntrl = np.array(json['ncntrl'])
         self.src_is_cntrl = False
         if 'src_is_cntrl' in json:
             self.src_is_cntrl = json['src_is_cntrl']

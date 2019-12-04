@@ -1,4 +1,4 @@
-from coregister.solve_3d import Solve3D
+from coregister.solve import Solve3D
 import numpy as np
 import copy
 
