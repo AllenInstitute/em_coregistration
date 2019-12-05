@@ -15,40 +15,40 @@
 			},
                         {
                                 "name": "ChunkedModel",
-				"order": 2,
+				"order": 1,
 				"nchunks": 5,
 				"axis": 2
                         },
                         {
                                 "name": "ChunkedModel",
-				"order": 2,
+				"order": 1,
 				"nchunks": 21,
 				"axis": 2
                         },
                         {
                                 "name": "SplineModel",
                                 "ncntrl": [3, 3, 3],
-                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e-10]
+                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e6]
                         },
                         {
                                 "name": "SplineModel",
                                 "ncntrl": [5, 5, 5],
-                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e-10]
+                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e8]
                         },
                         {
                                 "name": "SplineModel",
-                                "ncntrl": [6, 6, 6],
-                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e-10]
+                                "ncntrl": [10, 10, 10],
+                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e9]
                         },
                         {
                                 "name": "SplineModel",
-                                "ncntrl": [7, 7, 7],
-                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e-10]
+                                "ncntrl": [12, 12, 12],
+                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e9]
                         },
                         {
                                 "name": "SplineModel",
                                 "src_is_cntrl": true,
-                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e-10]
+                                "regularization": [1e-6, 1e-6, 1e-6, 1e-6, 1e5]
                         }
                             ]
 	}
