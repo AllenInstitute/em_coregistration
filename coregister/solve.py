@@ -86,6 +86,12 @@ class Solve3D(argschema.ArgSchemaParser):
                 self.transform.tform(self.data['src']))
         self.residual_mag = np.linalg.norm(self.residuals, axis=1)
 
+        if self.left_out is not None:
+            self.leave_out_res = (
+                    self.left_out['dst'] - 
+                    self.transform.tform(self.left_out['src']))
+            self.leave_out_rmag = np.linalg.norm(self.leave_out_res, axis=1)
+
         print('average residual [dst units]: %0.4f' % (
             self.residual_mag.mean()))
 
