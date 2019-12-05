@@ -55,9 +55,13 @@ class SplineModel():
 
         if ncntrl is not None:
             self.ncntrl = np.array(ncntrl)
+        ptp = src.ptp(axis=0)
+        delta = [0.01 * p / (n - 2) for p, n in zip(ptp, self.ncntrl)]
         x, y, z = [
                 np.linspace(
-                    src[:, i].min(), src[:, i].max(), self.ncntrl[i] + 2)[1:-1]
+                    src[:, i].min() - delta[i],
+                    src[:, i].max() + delta[i],
+                    self.ncntrl[i])
                 for i in [0, 1, 2]]
         xt, yt, zt = np.meshgrid(x, y, z)
         self.control_pts = np.vstack((
