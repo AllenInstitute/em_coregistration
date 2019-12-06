@@ -24,22 +24,24 @@ class PolynomialModel():
         self.set_regularization(regularization)
 
         if parameters is None:
-            self.parameters = np.array([
-                [0.0, 0.0, 0.0]])
-            if self.order > 0:
-                self.parameters = np.vstack((
-                    self.parameters,
-                    np.array([
-                        [1.0, 0.0, 0.0],
-                        [0.0, 1.0, 0.0],
-                        [0.0, 0.0, 1.0]])))
-            if self.order > 1:
-                self.parameters = np.vstack((
-                    self.parameters,
-                    np.zeros((self.ndict[self.order] - 4, 3))))
-
+            self.set_identity_parameters()
         else:
             self.parameters = np.array(parameters)
+
+    def set_identity_parameters(self):
+       self.parameters = np.array([
+           [0.0, 0.0, 0.0]])
+       if self.order > 0:
+           self.parameters = np.vstack((
+               self.parameters,
+               np.array([
+                   [1.0, 0.0, 0.0],
+                   [0.0, 1.0, 0.0],
+                   [0.0, 0.0, 1.0]])))
+       if self.order > 1:
+           self.parameters = np.vstack((
+               self.parameters,
+               np.zeros((self.ndict[self.order] - 4, 3))))
 
     def set_regularization(self, regularization=None):
         if regularization is None:
@@ -54,6 +56,8 @@ class PolynomialModel():
         self.order = json['order']
         if 'parameters' in json:
             self.parameters = np.array(json['parameters'])
+        else:
+            self.set_identity_parameters()
         regularization = None
         if 'regularization' in json:
             regularization = json['regularization']
@@ -117,4 +121,5 @@ class PolynomialModel():
                 self.kernel(src),
                 wts,
                 self.regularization,
+                self.parameters,
                 dst)

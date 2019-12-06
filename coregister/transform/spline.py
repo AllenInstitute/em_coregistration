@@ -49,26 +49,32 @@ class SplineModel():
 
     def set_control_pts_from_src(self, src, ncntrl=None, src_is_cntrl=False):
         if src_is_cntrl:
+            self.src_is_cntrl = True
             self.control_pts = np.copy(src)
-            self.extend_regularization()
-            return
+            self.ncntrl = np.array([src.shape[0]])
 
-        if ncntrl is not None:
-            self.ncntrl = np.array(ncntrl)
-        ptp = src.ptp(axis=0)
-        delta = [0.01 * p / (n - 2) for p, n in zip(ptp, self.ncntrl)]
-        x, y, z = [
-                np.linspace(
-                    src[:, i].min() - delta[i],
-                    src[:, i].max() + delta[i],
-                    self.ncntrl[i])
-                for i in [0, 1, 2]]
-        xt, yt, zt = np.meshgrid(x, y, z)
-        self.control_pts = np.vstack((
-            xt.flatten(),
-            yt.flatten(),
-            zt.flatten())).transpose()
+        else:
+            if ncntrl is not None:
+                self.ncntrl = np.array(ncntrl)
+            ptp = src.ptp(axis=0)
+            niter = self.ncntrl.tolist()
+            niter = [i if i > 2 else 3 for i in niter]
+            delta = [0.01 * p / (n - 2) for p, n in zip(ptp, niter)]
+            x, y, z = [
+                    np.linspace(
+                        src[:, i].min() - delta[i],
+                        src[:, i].max() + delta[i],
+                        self.ncntrl[i])
+                    for i in [0, 1, 2]]
+            xt, yt, zt = np.meshgrid(x, y, z)
+            self.control_pts = np.vstack((
+                xt.flatten(),
+                yt.flatten(),
+                zt.flatten())).transpose()
+
         self.extend_regularization()
+        if self.parameters.shape[0] != self.control_pts.shape[0] + 4:
+                self.set_identity_parameters()
 
     def set_regularization(self, regularization=None):
         if regularization is None:
@@ -161,4 +167,5 @@ class SplineModel():
                 self.kernel(src),
                 wts,
                 self.regularization,
+                self.parameters,
                 dst)
