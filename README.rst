@@ -40,18 +40,21 @@ User Guide
 solve and use transform
 -----------------------
 ::
-    import json                                                                                                         
-    import coregister.solve as cs                                                                                                      
+
+    import json
+    import coregister.solve as cs
     with open("./data/staged_transform_args.json", "r") as f: 
-        j =json.load(f)                                                                                                                                   
+        j =json.load(f)                      
     s = cs.Solve3D(input_data=j, args=['--output_json', 'solved_transform_out.json'])                                       
     s.run()                                                                                                                 
 
-    from coregister.transform.transform import Transform                                                                               
+    from coregister.transform.transform import Transform          
     with open('./solved_transform_out.json', 'r') as f: 
-        tfj = json.load(f)                                                                                                                                    
-    t = Transform(json=tfj)                                                                                                     
-    src = s.data['src'][0:5]                                                                                                     dst = s.data['dst'][0:5]                                                                                                     src                                                                                                                      
+        tfj = json.load(f)
+    t = Transform(json=tfj)                                                                                                 
+    src = s.data['src'][0:5]                                                                                              
+    dst = s.data['dst'][0:5]                                                                                                 
+    src                                                                                                                     
     Out[20]: 
     array([[0.804354, 0.387835, 0.274648],
            [0.869191, 0.138524, 0.156319],
