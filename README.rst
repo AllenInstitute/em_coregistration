@@ -27,12 +27,12 @@ Supported by the Intelligence Advanced Research Projects Activity (IARPA) via De
 Important Files
 ###############
 
-* `data/staged_transform_args.json` : input arguments for solve 2P->EM
-* `data/inverse_staged_transform_args.json` : the other way
-* `data/staged_transform_solution.json` : transform solution 2P -> EM
-* `data/inverse_staged_transform_solution.json` : the other way
-* `data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Masterleave_outs.json` : leave-one-out residuals
-* `data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Masterinverse_leave_outs.json` : the other way
+* **data/staged_transform_args.json** : input arguments for solve 2P->EM
+* **data/inverse_staged_transform_args.json** : the other way
+* **data/staged_transform_solution.json** : transform solution 2P -> EM
+* **data/inverse_staged_transform_solution.json** : the other way
+* **data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Masterleave_outs.json** : leave-one-out residuals
+* **data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Masterinverse_leave_outs.json** : the other way
 
 User Guide
 ##########
