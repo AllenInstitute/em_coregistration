@@ -52,7 +52,10 @@ class DataLoader(argschema.ArgSchemaParser):
         if (not self.args['all_flags']) & ('flag' in self.df.columns):
             self.df = self.df[self.df['flag']]
 
-        label_nums = np.array([int(re.findall("\d+", lab)[0]) for lab in self.df['label']])
+        if self.df['label'].dtype == 'int64':
+            label_nums = self.df['label'].values
+        else:
+            label_nums = np.array([int(re.findall("\d+", lab)[0]) for lab in self.df['label']])
         ind = (label_nums > self.args['exclude_labels'][0]) & \
                   (label_nums < self.args['exclude_labels'][1])
         ind = np.invert(ind)
