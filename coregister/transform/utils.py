@@ -25,7 +25,7 @@ def solve(A, w, r, dst):
 
     """
     ATW = A.transpose().dot(w)
-    K = ATW.dot(A) + r
+    K = ATW.dot(A) + np.eye(r.size) * r
     lu, piv = scipy.linalg.lu_factor(K, overwrite_a=True)
     x = np.zeros((A.shape[1], dst.shape[1]))
     for i in range(dst.shape[1]):
