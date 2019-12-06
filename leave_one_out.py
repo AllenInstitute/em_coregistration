@@ -1,28 +1,31 @@
-from coregister.staged_solve import StagedSolve
-from coregister.data_handler import DataLoader
+from coregister.solve import Solve3D
+from coregister.data_loader import DataLoader
 import multiprocessing
 import numpy as np
 import copy
 import os
 import json
+import tempfile
 
 leave_out_frac = 1.0
 
 with open("./data/staged_transform_args.json", "r") as f:
     args = json.load(f)
-
+#tlast = copy.deepcopy(args['transform']['transforms'][-1])
+#args['transform']['transforms'] = args['transform']['transforms'][0:3]
+#args['transform']['transforms'].append(tlast)
 
 def solve_job(args):
-    s = StagedSolve(input_data=args, args=[])
-    s.run()
+    with tempfile.NamedTemporaryFile() as temp:
+        s = Solve3D(input_data=args, args=['--output_json', temp.name])
+        s.run()
     res = {
-            s.leave_out_label: {
-                'leave_out_rmag': s.leave_out_rmag,
-                'leave_out_res': s.leave_out_res,
-                'avdelta_cntrl': s.avdelta,
-                'leave_in_res': np.linalg.norm(s.residuals, axis=1).mean()
+            s.left_out['labels'][0]: {
+                'leave_out_rmag': s.leave_out_rmag.tolist(),
+                'leave_out_res': s.leave_out_res.tolist(),
                 }
             }
+    print(res)
     return res
 
 

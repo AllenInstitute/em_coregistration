@@ -34,7 +34,7 @@ for i in range(1, ntransforms + 1):
         src = tf.transforms[-1].control_pts
         dst = tf.transforms[-1].tform(src)
         mov = np.linalg.norm(dst - src, axis=1).mean()
-        infostr += " cntrls moved {:0.3f}".format(mov)
+        infostr += " {} cntrls moved {:0.3f}".format(src.shape[0], mov)
     print(infostr)
 
 
