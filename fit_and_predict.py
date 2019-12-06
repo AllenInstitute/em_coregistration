@@ -8,6 +8,8 @@ import numpy as np
 
 
 # solve with some inputs
+#args_path = "./data/inverse_staged_transform_args.json"
+#output_path = "./data/inverse_staged_transform_solution.json"
 args_path = "./data/staged_transform_args.json"
 output_path = "./data/staged_transform_solution.json"
 s = Solve3D(args=[
@@ -29,12 +31,12 @@ for i in range(1, ntransforms + 1):
     residuals = tf.tform(s.data['src']) - s.data['dst']
     rmag = np.linalg.norm(residuals, axis=1).mean()
     lastone = tf.transforms[-1].__class__.__name__
-    infostr = "{} residual {:0.3f}".format(lastone, rmag)
+    infostr = "{} residual {:0.6f}".format(lastone, rmag)
     if lastone == "SplineModel":
         src = tf.transforms[-1].control_pts
         dst = tf.transforms[-1].tform(src)
         mov = np.linalg.norm(dst - src, axis=1).mean()
-        infostr += " {} cntrls moved {:0.3f}".format(src.shape[0], mov)
+        infostr += " {} cntrls moved {:0.6f}".format(src.shape[0], mov)
     print(infostr)
 
 

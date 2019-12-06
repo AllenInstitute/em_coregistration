@@ -11,9 +11,10 @@ leave_out_frac = 1.0
 
 with open("./data/staged_transform_args.json", "r") as f:
     args = json.load(f)
-#tlast = copy.deepcopy(args['transform']['transforms'][-1])
-#args['transform']['transforms'] = args['transform']['transforms'][0:3]
-#args['transform']['transforms'].append(tlast)
+suffix = 'leave_outs.json'
+#with open("./data/inverse_staged_transform_args.json", "r") as f:
+#    args = json.load(f)
+#suffix = 'inverse_leave_outs.json'
 
 def solve_job(args):
     with tempfile.NamedTemporaryFile() as temp:
@@ -58,6 +59,6 @@ loo_name = os.path.join(
         os.path.dirname(args['data']['landmark_file']),
         os.path.splitext(
             os.path.basename(args['data']['landmark_file']))[0] +
-        '_leave_outs.json')
+        suffix)
 with open(loo_name, 'w') as f:
     json.dump(loo, f, indent=2)
