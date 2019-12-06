@@ -83,34 +83,28 @@ from the root dir of this repo. If running as an installed package, you'll need 
 ::
    python fit_and_predict.py
 
-   average residual [dst units]: 10803.2841
-   average residual [dst units]: 5626.8712
-   average residual [dst units]: 4696.0970
-   average residual [dst units]: 3975.3966
-   average residual [dst units]: 3480.0259
-   average residual [dst units]: 3053.2877
-   average residual [dst units]: 2877.6895
-   average residual [dst units]: 3.0340
-   transform 0 control points moved average of 1407.9um
-   transform 1 control points moved average of 18.0um
-   transform 2 control points moved average of 6.6um
-   transform 3 control points moved average of 12.5um
-   transform 4 control points moved average of 7.5um
-   transform 5 control points moved average of 3.8um
-   transform 6 control points moved average of 1.6um
-   transform 7 control points moved average of 2.9um
-   worst points
-      Pt-1729      134.9
-      Pt-3159      134.3
-      Pt-2155      124.4
-      Pt-1610      124.1
-      Pt-3094      116.6
-       Pt-415      116.5
-      Pt-2138      109.9
-      Pt-2136      109.0
-      Pt-3782       87.2
-      Pt-1024       86.8
-   wrote data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Master_updated.csv
+    average residual [dst units]: 3.1620
+    worst points
+       Pt-3044   0.020422
+        Pt-727   0.035287
+       Pt-1047   0.042640
+       Pt-2182   0.047620
+        Pt-236   0.047632
+       Pt-2211   0.049158
+       Pt-2757   0.053443
+       Pt-1862   0.057763
+        Pt-768   0.058496
+      Pt-25103   0.058756
+    PolynomialModel residual 9932.802718
+    ChunkedModel residual 7296.263690
+    ChunkedModel residual 5909.392451
+    SplineModel residual 4503.411981 27 cntrls moved 22585.214699
+    SplineModel residual 3781.220908 125 cntrls moved 18947.336478
+    SplineModel residual 3173.745507 1000 cntrls moved 6918.062524
+    SplineModel residual 2893.618486 1728 cntrls moved 3360.592100
+    SplineModel residual 3.161994 2936 cntrls moved 2892.010575
+    wrote data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Master_updated.csv
+
 
 this just performed a staged solve, showing residuals and control point motions for the specified transform steps. Refer to fit_and_predict.py for more details.
 
