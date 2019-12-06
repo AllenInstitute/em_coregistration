@@ -1,5 +1,5 @@
 import scipy.spatial
-from .data_handler import DataLoader
+from .data_loader import DataLoader
 from .schemas import DataFilterSchema
 import argschema
 import numpy as np
@@ -35,13 +35,13 @@ class DataFilter(argschema.ArgSchemaParser):
     default_schema = DataFilterSchema
 
     def run(self):
-        d1 = DataLoader(input_data=self.args['dset1'])
+        d1 = DataLoader(input_data=self.args['dset1'], args=[])
         d1.run()
         self.logger.setLevel('INFO')
         self.logger.info("\nbasis data spans: {} to {}".format(
             d1.data['src'].min(axis=0),
             d1.data['src'].max(axis=0)))
-        d2 = DataLoader(input_data=self.args['dset2'])
+        d2 = DataLoader(input_data=self.args['dset2'], args=[])
         d2.run()
         self.logger.setLevel('INFO')
         self.logger.info("\nto be filtered data spans: {} to {}".format(
@@ -53,16 +53,12 @@ class DataFilter(argschema.ArgSchemaParser):
         hull = scipy.spatial.Delaunay(d1.data['src'])
         self.inside = hull.find_simplex(d2.data['src']) >= 0
 
-        k = 53598
-
-        print(d2.data.keys())
-
         self.newdata = {
                 'src': d2.data['src'][self.inside],
                 'labels': d2.data['labels'][self.inside]
                 }
 
-        dsoma = DataLoader(input_data=self.args['dset_soma'])
+        dsoma = DataLoader(input_data=self.args['dset_soma'], args=[])
         dsoma.run()
 
         dists = scipy.spatial.distance.cdist(
@@ -72,17 +68,11 @@ class DataFilter(argschema.ArgSchemaParser):
         self.closest = self.newdata['src'][distmin]
 
         self.logger.setLevel('INFO')
-        for i in range(self.newdata['src'].shape[0]):
-            if np.all(np.isclose(d2.data['src'][k], self.newdata['src'][i])):
-                print(i, self.newdata['src'][i])
-
         self.logger.info("\nfiltered data spans: {} to {}".format(
             self.newdata['src'].min(axis=0),
             self.newdata['src'].max(axis=0)))
         self.logger.info("\nfiltered data has shape: {}".format(
             self.newdata['src'].shape))
-
-        #self.newdata[:, 1] = (661 - self.newdata[:, 1] / 0.002) * 0.002
 
         nt = np.hstack((
             self.newdata['labels'].reshape(-1, 1),
@@ -93,5 +83,5 @@ class DataFilter(argschema.ArgSchemaParser):
 
 
 if __name__ == '__main__':
-    dfmod = DataFilter(input_data=example, args=[])
+    dfmod = DataFilter(input_data=example)
     dfmod.run()

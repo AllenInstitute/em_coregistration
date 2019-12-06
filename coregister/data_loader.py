@@ -28,6 +28,10 @@ def invert_y(y):
     return 1.322 - y
 
 
+def px_to_mm(x):
+    return 0.002 * x
+
+
 class DataLoader(argschema.ArgSchemaParser):
     """class to load and manipulate different sources of data
     """
@@ -48,7 +52,10 @@ class DataLoader(argschema.ArgSchemaParser):
         if (not self.args['all_flags']) & ('flag' in self.df.columns):
             self.df = self.df[self.df['flag']]
 
-        label_nums = np.array([int(re.findall("\d+", lab)[0]) for lab in self.df['label']])
+        if self.df['label'].dtype == 'int64':
+            label_nums = self.df['label'].values
+        else:
+            label_nums = np.array([int(re.findall("\d+", lab)[0]) for lab in self.df['label']])
         ind = (label_nums > self.args['exclude_labels'][0]) & \
                   (label_nums < self.args['exclude_labels'][1])
         ind = np.invert(ind)
@@ -61,7 +68,7 @@ class DataLoader(argschema.ArgSchemaParser):
         if 'opt_px_to_mm' in self.args['actions']:
             for k in self.df.columns:
                 if 'opt' in k:
-                    self.df[k] *= 0.002
+                    self.df[k] = px_to_mm(self.df[k])
 
         self.data = {}
         if self.args['all_flags']:
@@ -73,20 +80,8 @@ class DataLoader(argschema.ArgSchemaParser):
             if set(a).issubset(set(self.df.columns)):
                 self.data[k] = self.df[a].values.astype('float')
 
-    #def write_to_file(self, fname, header=True, label_format='%d', data_format='%0.3f'):
-    #    fmts = []
-    #    for k in self.args['header']:
-    #        if k == ['label']:
-    #            fmts.append(label_format)
-    #        else:
-    #            fmts.append(data_format)
-    #    if 'label' in self.args['header']:
-    #        nt = np.hstack((
-    #            self.data['labels'].reshape(-1, 1),
-    #            self.data['src']))
 
-
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     d1 = DataLoader(input_data=example1, args=[])
     d1.run()
     d2 = DataLoader(input_data=example2, args=[])
