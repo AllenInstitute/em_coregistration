@@ -101,7 +101,7 @@ def test_chunked_values():
     order = 1
     axis = 2
     nchunks = 10
-    src = np.random.randn(1000, 3)
+    src = np.random.rand(5000, 3)
     t1 = PolynomialModel(order=order, parameters=random_affine_parameters())
     t2 = PolynomialModel(order=order, parameters=random_affine_parameters())
 
