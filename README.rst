@@ -24,10 +24,58 @@ Acknowledgement of Government Sponsorship
 
 Supported by the Intelligence Advanced Research Projects Activity (IARPA) via Department of Interior / Interior Business Center (DoI/IBC) contract number D16PC00004. The U.S. Government is authorized to reproduce and distribute reprints for Governmental purposes notwithstanding any copyright annotation thereon. Disclaimer: The views and conclusions contained herein are those of the authors and should not be interpreted as necessarily representing the official policies or endorsements, either expressed or implied, of IARPA, DoI/IBC, or the U.S. Government.
 
+Important Files
+###############
+
+* `data/staged_transform_args.json` : input arguments for solve 2P->EM
+* `data/inverse_staged_transform_args.json` : the other way
+* `data/staged_transform_solution.json` : transform solution 2P -> EM
+* `data/inverse_staged_transform_solution.json` : the other way
+* `data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Masterleave_outs.json` : leave-one-out residuals
+* `data/17797_2Pfix_EMmoving_20191010_1652_piecewise_trial_updated_Masterinverse_leave_outs.json` : the other way
 
 User Guide
 ##########
 
+solve and use transform
+-----------------------
+::
+    import json                                                                                                         
+    import coregister.solve as cs                                                                                                      
+    with open("./data/staged_transform_args.json", "r") as f: 
+        j =json.load(f)                                                                                                                                   
+    s = cs.Solve3D(input_data=j, args=['--output_json', 'solved_transform_out.json'])                                       
+    s.run()                                                                                                                 
+
+    from coregister.transform.transform import Transform                                                                               
+    with open('./solved_transform_out.json', 'r') as f: 
+        tfj = json.load(f)                                                                                                                                    
+    t = Transform(json=tfj)                                                                                                     
+    src = s.data['src'][0:5]                                                                                                     dst = s.data['dst'][0:5]                                                                                                     src                                                                                                                      
+    Out[20]: 
+    array([[0.804354, 0.387835, 0.274648],
+           [0.869191, 0.138524, 0.156319],
+           [0.85027 , 0.257353, 0.067352],
+           [0.924324, 0.750244, 0.225444],
+           [0.934366, 0.182291, 0.188485]])
+    dst
+    Out[21]:
+    array([[1172669.4,  717762.7,  282148.8],
+           [1391713. ,  593754.5,  337574.1],
+           [1287230.6,  508049.5,  321659.2],
+           [ 869550.9,  684943.2,  399641.7],
+           [1363565.2,  611139.6,  398796.7]])
+
+    t.tform(src)                                                                                                             
+    Out[22]: 
+    array([[1172669.3087167 ,  717762.76429371,  282148.60118503],
+           [1391715.11237805,  593753.07429628,  337574.56376036],
+           [1287230.51081691,  508049.13923649,  321659.30456869],
+           [ 869551.3786766 ,  684942.05607145,  399640.98195057],
+           [1363565.80927674,  611138.89843287,  398797.29234907]])
+
+more detail for the solving process
+-----------------------------------
 from the root dir of this repo. If running as an installed package, you'll need to copy this data directory somewhere with r/w permissions.
 ::
    python fit_and_predict.py
