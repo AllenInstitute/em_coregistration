@@ -1,7 +1,7 @@
 .. image:: https://travis-ci.com/AllenInstitute/em_coregistration.svg?branch=master
     :target: https://travis-ci.com/AllenInstitute/em_coregistration
-.. image:: https://codecov.io/gh/codecov/em_coregistration/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/codecov/em_coregistration
+.. image:: https://codecov.io/gh/codecov/AllenInstitute/em_coregistration/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/codecov/AllenInstitute/em_coregistration
 
 
 em_coregistration
