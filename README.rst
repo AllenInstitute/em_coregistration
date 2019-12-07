@@ -3,7 +3,6 @@
 .. image:: https://codecov.io/gh/AllenInstitute/em_coregistration/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/AllenInstitute/em_coregistration
 
-
 em_coregistration
 #################
 
