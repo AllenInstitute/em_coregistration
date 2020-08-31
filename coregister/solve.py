@@ -96,7 +96,7 @@ class Solve3D(argschema.ArgSchemaParser):
             self.residual_mag.mean()))
 
         inds = np.argsort(self.residual_mag)
-        self.sorted_labeled_residuals = [(self.data['labels'][i], self.residual_mag[i]) for i in inds]
+        self.sorted_labeled_residuals = [(self.data['labels'][i], self.residual_mag[i]) for i in inds][::-1]
 
         self.output(self.transform.to_dict(), indent=2)
 

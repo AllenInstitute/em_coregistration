@@ -1,0 +1,54 @@
+{
+        "data": {
+            "landmark_file": "data/17797_2Pfix_EMmoving_Phase3.csv",
+            "header": ["label", "flag", "emx", "emy", "emz", "optx", "opty", "optz"],
+            "actions": [],
+            "sd_set": {"src": "em", "dst": "opt"}
+        },
+        "transform": {
+		"name": "TransformList",
+		"transforms": [
+			{
+				"name": "PolynomialModel",
+                                "order": 2
+			},
+                        {
+                                "name": "ChunkedModel",
+				"order": 1,
+				"nchunks": 5,
+				"axis": 0
+                        },
+                        {
+                                "name": "ChunkedModel",
+				"order": 1,
+				"nchunks": 21,
+				"axis": 0
+                        },
+                        {
+                                "name": "SplineModel",
+                                "ncntrl": [3, 3, 3],
+                                "regularization": [1e-10, 1e-10, 1e-10, 1e-10, 1e-1]
+                        },
+                        {
+                                "name": "SplineModel",
+                                "ncntrl": [5, 5, 5],
+                                "regularization": [1e-10, 1e-10, 1e-10, 1e-10, 1e-1]
+                        },
+                        {
+                                "name": "SplineModel",
+                                "ncntrl": [10, 10, 10],
+                                "regularization": [1e-10, 1e-10, 1e-10, 1e-10, 1e-1]
+                        },
+                        {
+                                "name": "SplineModel",
+                                "ncntrl": [12, 12, 12],
+                                "regularization": [1e-10, 1e-10, 1e-10, 1e-10, 1e-1]
+                        },
+                        {
+                                "name": "SplineModel",
+                                "src_is_cntrl": true,
+                                "regularization": [1e-10, 1e-10, 1e-10, 1e-10, 1e-1]
+                        }
+                            ]
+	}
+}

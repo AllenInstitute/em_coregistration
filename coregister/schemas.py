@@ -46,10 +46,10 @@ class DataLoaderSchema(ArgSchema):
     exclude_labels = List(
         Int,
         required=True,
+        cli_as_single_argument=True,
         missing=[100000, 200000],
         default=[100000, 200000],
         description="ignore Pt labels in this range")
-
 
 class SolverSchema(ArgSchema):
     data = Nested(DataLoaderSchema)
