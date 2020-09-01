@@ -9,7 +9,9 @@ import tempfile
 
 leave_out_frac = 1.0
 
-with open("./data/staged_transform_args.json", "r") as f:
+#argpath = "./data/phase3_staged_transform_args.json"
+argpath = "./data/inverse_phase3_staged_transform_args.json"
+with open(argpath, "r") as f:
     args = json.load(f)
 suffix = 'leave_outs.json'
 #with open("./data/inverse_staged_transform_args.json", "r") as f:

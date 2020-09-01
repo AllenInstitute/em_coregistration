@@ -6,15 +6,20 @@ import os
 import json
 import numpy as np
 
+inverse = False
+if inverse:
+    # opt - to - em in this case
+    args_path = "./data/inverse_phase3_staged_transform_args.json"
+    output_path = "./data/inverse_phase3_staged_transform_solution.json"
+else:
+    # em - to - opt in this case
+    args_path = "./data/phase3_staged_transform_args.json"
+    output_path = "./data/phase3_staged_transform_solution.json"
 
-# solve with some inputs
-#args_path = "./data/inverse_staged_transform_args.json"
-#output_path = "./data/inverse_staged_transform_solution.json"
-args_path = "./data/phase3_staged_transform_args.json"
-output_path = "./data/phase3_staged_transform_solution.json"
 s = Solve3D(args=[
     "--input_json", args_path,
     "--output_json", output_path])
+#s.args['transform']['transforms'] = s.args['transform']['transforms'][0:8]
 s.run()
 print('worst points')
 for r in s.sorted_labeled_residuals[0:20]:
